@@ -1,0 +1,89 @@
+---
+title: Introduction
+description: The Artifact SDK for AI Agents
+icon: "book-open"
+---
+
+# What is Artifactuse?
+
+Artifactuse is a lightweight SDK that transforms AI-generated content into rich, interactive artifacts. Support for code previews, video editors, canvas/whiteboards, forms, social media previews, and more.
+
+## Features
+
+- 🎨 **Rich Content Detection** - Automatically detect and render code blocks, images, videos, maps, embeds
+- 📦 **Artifact Cards** - Beautiful inline cards for panel artifacts
+- 🖼️ **Panel Viewer** - Side panel with preview, code view, and split mode
+- 📝 **Interactive Forms** - Inline and panel forms with 17+ field types
+- 📱 **Social Previews** - Platform-accurate previews for Twitter, LinkedIn, Instagram
+- 🌗 **Theme Support** - Dark/light mode with customizable colors
+- 🔌 **Framework Agnostic** - Works with Vue 3, Vue 2, React, Svelte, or vanilla JS
+- 📡 **Event System** - Hook into AI requests, form submissions, exports
+
+## Packages
+
+| Package | Description |
+|---------|-------------|
+| `artifactuse` | Core SDK with React, Vue, Svelte support |
+| `@artifactuse/prompts` | System prompts to teach AI models artifact generation |
+| `@artifactuse/panels` | Panel renderers (open source) |
+| `@artifactuse/studio` | Premium panels - Canvas, Video, Code Runtime (Enterprise) |
+
+## Artifact Types
+
+### Panel Artifacts
+
+Open in side panel with preview and code view:
+
+<CardGroup cols={3}>
+  <Card title="Canvas ⭐" icon="paintbrush">Graphics, banners, logos (Pro)</Card>
+  <Card title="Video ⭐" icon="video">Intros, animations (Pro)</Card>
+  <Card title="Code Runtime ⭐" icon="play">JS & Python execution (Pro)</Card>
+  <Card title="HTML" icon="code">Web pages</Card>
+  <Card title="React" icon="react">Components</Card>
+  <Card title="Vue" icon="vuejs">SFCs</Card>
+</CardGroup>
+
+<Note>
+  ⭐ Pro panels require a [Pro subscription](https://artifactuse.com/pricing). All other panels are free and open source.
+</Note>
+
+### Inline Artifacts
+
+Render directly in the message:
+
+<CardGroup cols={3}>
+  <Card title="Forms" icon="layout-panel-top">Quick inputs, buttons</Card>
+  <Card title="Social" icon="share-2">7 platform previews</Card>
+  <Card title="Images" icon="image">Auto-detected URLs</Card>
+  <Card title="Videos" icon="play">YouTube, Vimeo, Loom</Card>
+  <Card title="Maps" icon="map">Google Maps, OpenStreetMap</Card>
+  <Card title="Embeds" icon="app-window-mac">Figma, CodePen, 20+ more</Card>
+</CardGroup>
+
+## How It Works
+
+```
+AI Response → processMessage()
+           ↓
+    extractCodeBlockArtifacts()
+           ↓
+    Returns { html, artifacts[] }
+           ↓
+    ArtifactuseAgentMessage renders:
+           ↓
+    ┌─────────────────────────────────────┐
+    │ type: form + inline  → <InlineForm> │
+    │ type: social         → <SocialPreview> │
+    │ type: code           → <Card> → Panel │
+    │ type: form + panel   → <Card> → Panel │
+    └─────────────────────────────────────┘
+```
+
+## Framework Support
+
+| Framework | Import Path | Status |
+|-----------|-------------|--------|
+| Vue 3 / Nuxt 3 | `artifactuse/vue` | ✅ |
+| Vue 2 / Nuxt 2 | `artifactuse/vue2` | ✅ |
+| React / Next.js | `artifactuse/react` | ✅ |
+| Svelte / SvelteKit | `artifactuse/svelte` | ✅ |

@@ -1,0 +1,284 @@
+---
+title: "Examples"
+description: "See what you can build with Artifactuse"
+icon: "sparkles"
+---
+
+Explore real-world examples of how teams are using Artifactuse to build AI products that go beyond simple chat interfaces.
+
+---
+
+## AI Design Assistant
+
+<Card title="Design me a YouTube thumbnail" icon="palette">
+
+Your users describe what they want. The AI generates it in the canvas editor. They tweak colors, add text, and export as PNG.
+
+<Steps>
+  <Step title="User describes their vision">
+    "Create a YouTube thumbnail for my cooking video about pasta recipes"
+  </Step>
+  <Step title="AI generates in Canvas Editor">
+    Artifactuse renders an interactive canvas with the generated design
+  </Step>
+  <Step title="User customizes">
+    Adjust colors, move elements, change text, resize
+  </Step>
+  <Step title="Export">
+    Download as PNG, JPG, or SVG
+  </Step>
+</Steps>
+
+**Artifacts used:** `Canvas Editor`, `Social Previews`
+
+</Card>
+
+---
+
+## Content Marketing Tool
+
+<Card title="Create a 10-second intro for my podcast" icon="video">
+
+The AI builds a video with animated titles, transitions, and brand colors. Users preview it, adjust timing, and export.
+
+<Steps>
+  <Step title="User provides brand details">
+    "My podcast is called 'Tech Today' - use blue and white colors"
+  </Step>
+  <Step title="AI generates video">
+    Artifactuse renders a timeline-based video editor with the intro
+  </Step>
+  <Step title="User refines">
+    Adjust timing, change transitions, modify text animations
+  </Step>
+  <Step title="Export">
+    Download as MP4 or GIF
+  </Step>
+</Steps>
+
+**Artifacts used:** `Video Editor`, `Canvas Editor`
+
+</Card>
+
+---
+
+## Code Tutoring Platform
+
+<Card title="Teach me how sorting algorithms work" icon="graduation-cap">
+
+The AI explains bubble sort, then runs it live. Students see console output, modify code, and compare solutions.
+
+<Steps>
+  <Step title="Student asks a question">
+    "Can you show me how bubble sort works?"
+  </Step>
+  <Step title="AI explains with live code">
+    Artifactuse renders executable code with visualization
+  </Step>
+  <Step title="Student experiments">
+    Modify the array, change the algorithm, see results instantly
+  </Step>
+  <Step title="Compare solutions">
+    View side-by-side diff of different sorting approaches
+  </Step>
+</Steps>
+
+**Artifacts used:** `Code Runtime`, `Code Preview`
+
+```javascript
+// Example: Bubble Sort Visualization
+function bubbleSort(arr) {
+  const n = arr.length;
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = 0; j < n - i - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+      }
+    }
+  }
+  return arr;
+}
+
+console.log(bubbleSort([64, 34, 25, 12, 22, 11, 90]));
+// Output: [11, 12, 22, 25, 34, 64, 90]
+```
+
+</Card>
+
+---
+
+## Data Analysis Copilot
+
+<Card title="Analyze this CSV and find trends" icon="chart-bar">
+
+Users upload data. The AI writes Python, executes it, and returns visualizations. JSON viewer for raw data exploration.
+
+<Steps>
+  <Step title="User uploads data">
+    Drag and drop a CSV file into the chat
+  </Step>
+  <Step title="AI analyzes">
+    Artifactuse executes Python code to process the data
+  </Step>
+  <Step title="Visualize results">
+    Interactive charts and graphs rendered inline
+  </Step>
+  <Step title="Explore raw data">
+    JSON tree viewer for drilling into specific data points
+  </Step>
+</Steps>
+
+**Artifacts used:** `Code Runtime (Python)`, `JSON Viewer`
+
+```python
+# Example: Data Analysis with Pandas
+import pandas as pd
+
+# Load and analyze
+df = pd.read_csv('sales_data.csv')
+
+# Find trends
+monthly_sales = df.groupby('month')['revenue'].sum()
+top_products = df.groupby('product')['units'].sum().nlargest(5)
+
+print(f"Total Revenue: ${df['revenue'].sum():,.2f}")
+print(f"Best Month: {monthly_sales.idxmax()}")
+```
+
+</Card>
+
+---
+
+## Customer Support Agent
+
+<Card title="I need to update my billing info" icon="headphones">
+
+The AI presents an inline form. User fills it out and submits. Data flows back to the AI for processing.
+
+<Steps>
+  <Step title="User makes a request">
+    "I need to change my credit card on file"
+  </Step>
+  <Step title="AI presents a form">
+    Secure, inline form rendered in the conversation
+  </Step>
+  <Step title="User submits">
+    Form data is validated and submitted
+  </Step>
+  <Step title="AI confirms">
+    Confirmation message with updated details
+  </Step>
+</Steps>
+
+**Artifacts used:** `Forms`, `Inline Artifacts`
+
+</Card>
+
+---
+
+## Social Media Manager
+
+<Card title="Draft a LinkedIn post announcing our funding" icon="share-2">
+
+The AI writes the post and shows a pixel-perfect preview. Users see exactly how it'll look before publishing.
+
+<Steps>
+  <Step title="User describes the announcement">
+    "We just raised $5M Series A, announce it professionally"
+  </Step>
+  <Step title="AI drafts the post">
+    Generates copy optimized for LinkedIn engagement
+  </Step>
+  <Step title="Preview">
+    Pixel-perfect LinkedIn post preview with your profile
+  </Step>
+  <Step title="Refine and copy">
+    Edit the text, then copy to clipboard for posting
+  </Step>
+</Steps>
+
+**Artifacts used:** `Social Previews`, `Forms`
+
+</Card>
+
+---
+
+## Interactive Documentation
+
+<Card title="Show me how to use the useEffect hook" icon="book-open">
+
+Documentation that comes alive. Users read explanations, see live code examples, and experiment in real-time.
+
+<Steps>
+  <Step title="User asks about a concept">
+    "How does useEffect work in React?"
+  </Step>
+  <Step title="AI explains with examples">
+    Live, editable React components demonstrating the concept
+  </Step>
+  <Step title="User experiments">
+    Modify the code and see changes instantly
+  </Step>
+  <Step title="Save snippets">
+    Copy working code to their project
+  </Step>
+</Steps>
+
+**Artifacts used:** `Code Preview (React)`, `Code Runtime`
+
+```jsx
+// Example: Interactive useEffect Demo
+import { useState, useEffect } from 'react';
+
+export default function Timer() {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSeconds(s => s + 1);
+    }, 1000);
+
+    // Cleanup on unmount
+    return () => clearInterval(interval);
+  }, []);
+
+  return <div>Seconds: {seconds}</div>;
+}
+```
+
+</Card>
+
+---
+
+## Quick Reference
+
+<CardGroup cols={2}>
+  <Card title="Canvas Editor" icon="palette" href="/artifacts/canvas">
+    Graphics, banners, logos, diagrams with full vector editing
+  </Card>
+  <Card title="Video Editor" icon="video" href="/artifacts/video">
+    Timeline-based editing with tracks, effects, transitions
+  </Card>
+  <Card title="Code Artifacts" icon="code" href="/artifacts/code">
+    HTML, React, Vue, Svelte with live preview
+  </Card>
+  <Card title="Forms" icon="square-check" href="/artifacts/forms">
+    Interactive forms, wizards, button groups
+  </Card>
+  <Card title="Social Previews" icon="share-2" href="/artifacts/social">
+    Twitter, LinkedIn, Instagram, Facebook previews
+  </Card>
+  <Card title="AI Prompts" icon="sparkles" href="/prompts/overview">
+    System prompts to unlock artifact generation
+  </Card>
+</CardGroup>
+
+---
+
+## Build Your Own
+
+Ready to create experiences like these? Start with our quickstart guide:
+
+<Card title="Get Started in 5 Minutes" icon="rocket" href="/getting-started/quickstart">
+  Install the SDK, configure your AI, and render your first artifact.
+</Card>

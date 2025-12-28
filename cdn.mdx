@@ -1,0 +1,218 @@
+---
+title: CDN
+description: Deploy Artifactuse panels to your own CDN
+icon: "globe"
+---
+
+## Overview
+
+By default, Artifactuse loads panels from our CDN. You can deploy panels to your own CDN for full control.
+
+## Panels (Open Source)
+
+Panels are open source and free to self-host.
+
+**Included:**
+- JSON Viewer
+- SVG Viewer
+- Diff Viewer
+- HTML Preview
+- React Preview
+- Vue Preview
+- Form Panel
+
+### Setup
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/artifactuse/panels.git
+    cd panels
+    ```
+  </Step>
+  
+  <Step title="Install and build">
+    ```bash
+    npm install
+    npm run build
+    ```
+  </Step>
+  
+  <Step title="Deploy to your CDN">
+    **Option A: Using deploy script (AWS S3)**
+    
+    ```bash
+    export CDN_BUCKET=your-s3-bucket
+    export CDN_URL=https://cdn.yourdomain.com
+    export CLOUDFRONT_DISTRIBUTION_ID=XXXXX  # Optional
+    
+    npm run deploy
+    ```
+    
+    **Option B: Manual deployment**
+    
+    Copy each panel's `dist/` folder to your CDN:
+    
+    ```bash
+    # Example using AWS CLI
+    aws s3 sync packages/json-panel/dist s3://your-bucket/json-panel
+    aws s3 sync packages/svg-panel/dist s3://your-bucket/svg-panel
+    aws s3 sync packages/diff-panel/dist s3://your-bucket/diff-panel
+    aws s3 sync packages/html-panel/dist s3://your-bucket/html-panel
+    aws s3 sync packages/react-panel/dist s3://your-bucket/react-panel
+    aws s3 sync packages/vue-panel/dist s3://your-bucket/vue-panel
+    aws s3 sync packages/form-panel/dist s3://your-bucket/form-panel
+    ```
+    
+    Your CDN structure should look like:
+    
+    ```
+    https://cdn.yourdomain.com/
+    ├── json-panel/
+    ├── svg-panel/
+    ├── diff-panel/
+    ├── html-panel/
+    ├── react-panel/
+    ├── vue-panel/
+    └── form-panel/
+    ```
+  </Step>
+  
+  <Step title="Configure the SDK">
+    Point the SDK to your CDN:
+
+    ```javascript
+    provideArtifactuse({
+      cdnUrl: 'https://cdn.yourdomain.com',
+    })
+    ```
+  </Step>
+</Steps>
+
+## Studio Panels (Enterprise)
+
+Studio panels (Canvas Editor, Video Editor, Code Runtime) are available for Enterprise customers.
+
+**Included:**
+- Canvas Editor
+- Video Editor
+- Code Runtime (JavaScript & Python)
+
+### Setup
+
+<Steps>
+  <Step title="Contact us">
+    Email [hello@artifactuse.com](mailto:hello@artifactuse.com) to get access.
+  </Step>
+  
+  <Step title="Get repository access">
+    We'll add you to the private `@artifactuse/studio` repository.
+  </Step>
+  
+  <Step title="Clone, build, deploy">
+    Same process as panels:
+    
+    ```bash
+    git clone https://github.com/artifactuse/studio.git
+    cd studio
+    npm install
+    npm run build
+    ```
+    
+    **Option A: Using deploy script (AWS S3)**
+    
+    ```bash
+    export CDN_BUCKET=your-s3-bucket
+    export CDN_URL=https://cdn.yourdomain.com
+    
+    npm run deploy
+    ```
+    
+    **Option B: Manual deployment**
+    
+    ```bash
+    aws s3 sync packages/editor-panel/dist s3://your-bucket/editor-panel
+    aws s3 sync packages/code-panel/dist s3://your-bucket/code-panel
+    ```
+    
+    Your CDN structure should include:
+    
+    ```
+    https://cdn.yourdomain.com/
+    ├── editor-panel/
+    │   ├── canvas/
+    │   └── video/
+    └── code-panel/
+    ```
+  </Step>
+  
+  <Step title="Configure the SDK">
+    ```javascript
+    provideArtifactuse({
+      cdnUrl: 'https://cdn.yourdomain.com',
+    })
+    ```
+  </Step>
+</Steps>
+
+## Configuration
+
+### CDN URL
+
+```javascript
+// Vue
+provideArtifactuse({
+  cdnUrl: 'https://cdn.yourdomain.com',
+})
+
+// React
+<ArtifactuseProvider config={{
+  cdnUrl: 'https://cdn.yourdomain.com',
+}}>
+
+// Svelte
+setArtifactuseContext({
+  cdnUrl: 'https://cdn.yourdomain.com',
+})
+```
+
+### Version Pinning
+
+Pin to a specific version for stability:
+
+```javascript
+provideArtifactuse({
+  cdnUrl: 'https://cdn.yourdomain.com/v1.2.3',
+})
+```
+
+### CORS
+
+If your CDN is on a different domain, ensure CORS headers are configured:
+
+```
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, OPTIONS
+```
+
+## Comparison
+
+| | Artifactuse CDN | Your CDN |
+|--|-----------------|----------|
+| Setup | None | 10-15 min |
+| Maintenance | We handle it | You manage |
+| Updates | Automatic | Manual |
+| Latency | Global edge | Your infrastructure |
+| Control | Limited | Full |
+| Offline | No | Yes |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Panels" icon="github" href="https://github.com/artifactuse/panels">
+    Clone the open source repository
+  </Card>
+  <Card title="Studio Panels" icon="mail" href="mailto:hello@artifactuse.com">
+    Contact us for Enterprise access
+  </Card>
+</CardGroup>

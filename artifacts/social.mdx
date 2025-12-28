@@ -1,0 +1,161 @@
+---
+title: Social Preview
+description: Platform-accurate social media post previews
+icon: "share-2"
+---
+
+## Overview
+
+Social artifacts render realistic previews of social media posts.
+
+```json
+{
+  "type": "social",
+  "platform": "twitter",
+  "data": {
+    "author": {
+      "name": "Acme Corp",
+      "handle": "@acme",
+      "verified": true
+    },
+    "content": {
+      "text": "Excited to announce our new product! 🚀\n\n#launch #startup"
+    },
+    "engagement": {
+      "likes": 1234,
+      "retweets": 340,
+      "views": 45000
+    }
+  }
+}
+```
+
+## Platforms
+
+| Platform | Engagement Metrics |
+|----------|-------------------|
+| `twitter` | likes, retweets, replies, views, bookmarks |
+| `linkedin` | likes, comments, reposts |
+| `instagram` | likes, comments |
+| `facebook` | reactions, comments, shares |
+| `threads` | likes, replies, reposts |
+| `tiktok` | likes, comments, shares, saves |
+| `youtube` | views, likes, comments |
+
+## Structure
+
+```json
+{
+  "type": "social",
+  "platform": "twitter",
+  "data": {
+    "author": {...},
+    "content": {...},
+    "engagement": {...},
+    "meta": {...}
+  }
+}
+```
+
+## Author Object
+
+```json
+{
+  "author": {
+    "name": "Display Name",
+    "handle": "@username",
+    "avatar": "https://example.com/avatar.jpg",
+    "verified": true,
+    "verifiedType": "blue"
+  }
+}
+```
+
+## Content Object
+
+```json
+{
+  "content": {
+    "text": "Post text with #hashtags and @mentions",
+    "media": [
+      {"type": "image", "url": "https://example.com/image.jpg", "alt": "Description"}
+    ],
+    "link": {
+      "url": "https://example.com",
+      "title": "Page Title",
+      "description": "Page description",
+      "image": "https://example.com/og.jpg"
+    },
+    "poll": {
+      "options": ["Option A", "Option B"],
+      "votes": [60, 40],
+      "totalVotes": 1000
+    }
+  }
+}
+```
+
+## Examples
+
+### Twitter
+
+```json
+{
+  "type": "social",
+  "platform": "twitter",
+  "data": {
+    "author": {"name": "Acme", "handle": "@acme", "verified": true},
+    "content": {"text": "Big news coming soon! 🚀"},
+    "engagement": {"likes": 500, "retweets": 120, "views": 15000},
+    "meta": {"timestamp": "2h"}
+  }
+}
+```
+
+### LinkedIn
+
+```json
+{
+  "type": "social",
+  "platform": "linkedin",
+  "data": {
+    "author": {
+      "name": "Jane Smith",
+      "headline": "CEO at Acme Corp"
+    },
+    "content": {
+      "text": "Thrilled to share that we've raised our Series A!\n\nThis milestone wouldn't be possible without our amazing team."
+    },
+    "engagement": {"likes": 500, "comments": 45, "reposts": 20}
+  }
+}
+```
+
+### Instagram
+
+```json
+{
+  "type": "social",
+  "platform": "instagram",
+  "data": {
+    "author": {"name": "acme", "handle": "@acme"},
+    "content": {
+      "text": "Behind the scenes ✨",
+      "media": [{"type": "image", "url": "https://example.com/photo.jpg"}]
+    },
+    "engagement": {"likes": 2500, "comments": 89}
+  }
+}
+```
+
+## Handling Clicks
+
+```jsx
+<ArtifactuseAgentMessage
+  content={content}
+  onSocialClick={(platform, action) => {
+    console.log('Clicked:', platform, action)
+    // e.g., open compose window
+  }}
+/>
+```

@@ -1,0 +1,115 @@
+---
+title: AI Prompts
+description: Teach AI models to generate artifacts
+icon: "wand-sparkles"
+---
+
+## Overview
+
+The `@artifactuse/prompts` package provides system prompts that teach AI models how to generate Artifactuse artifacts.
+
+## Installation
+
+```bash
+npm install @artifactuse/prompts
+```
+
+## Usage
+
+Include prompts in your AI's system message:
+
+```javascript
+import { canvasPrompt, videoPrompt, formPrompt } from '@artifactuse/prompts'
+
+const systemPrompt = `
+You are a helpful assistant.
+
+${canvasPrompt}
+${videoPrompt}
+${formPrompt}
+`
+
+const response = await openai.chat.completions.create({
+  model: 'gpt-4',
+  messages: [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: 'Create a YouTube thumbnail' }
+  ]
+})
+```
+
+## Available Prompts
+
+| Import | Use Case | Size |
+|--------|----------|------|
+| `canvasPrompt` | Graphics, banners, logos | ~4.7KB |
+| `videoPrompt` | Video intros, animations | ~6.8KB |
+| `formPrompt` | Input forms, wizards | ~1.7KB |
+| `socialPrompt` | Social media previews | ~1.5KB |
+| `htmlPrompt` | Web pages | ~0.6KB |
+| `jsxPrompt` | React components | ~0.7KB |
+| `vuePrompt` | Vue components | ~0.5KB |
+| `javascriptPrompt` | JavaScript code | ~0.5KB |
+| `pythonPrompt` | Python code | ~0.5KB |
+| `jsonPrompt` | JSON data | ~0.4KB |
+| `svgPrompt` | Vector graphics | ~0.6KB |
+| `diffPrompt` | Code diffs | ~0.5KB |
+| `fullPrompt` | All artifacts | ~20KB |
+
+## Selective Import
+
+Only include what you need to minimize token usage:
+
+```javascript
+// Just canvas and video
+import { canvasPrompt, videoPrompt } from '@artifactuse/prompts'
+
+// Everything
+import { fullPrompt } from '@artifactuse/prompts'
+```
+
+## Helper Functions
+
+```javascript
+import { getPrompt, getPrompts } from '@artifactuse/prompts'
+
+// Get single prompt
+const prompt = getPrompt('canvas')
+
+// Get multiple prompts combined
+const prompts = getPrompts(['canvas', 'video', 'form'])
+```
+
+## CommonJS
+
+```javascript
+const { canvasPrompt, videoPrompt } = require('@artifactuse/prompts')
+```
+
+## Example: Creative Assistant
+
+```javascript
+import { canvasPrompt, videoPrompt } from '@artifactuse/prompts'
+
+const systemPrompt = `
+You are a creative assistant that helps users design graphics and videos.
+
+When users ask for:
+- Logos, banners, thumbnails, diagrams → use canvas
+- Video intros, animations, title sequences → use video
+
+${canvasPrompt}
+${videoPrompt}
+`
+```
+
+## How Prompts Work
+
+Each prompt contains:
+
+1. **Trigger conditions** - When to generate the artifact
+2. **Format specification** - Code block syntax
+3. **Schema** - Required and optional properties
+4. **Rules** - Constraints and best practices
+
+The AI learns to output properly formatted code blocks that Artifactuse can render.

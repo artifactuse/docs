@@ -1,0 +1,175 @@
+---
+title: Theming
+description: Customize colors and styles
+icon: "palette"
+---
+
+## Theme Modes
+
+```javascript
+const { setTheme, getTheme } = useArtifactuse()
+
+setTheme('dark')
+setTheme('light')
+setTheme('auto')  // Follow system preference
+
+const current = getTheme()
+```
+
+## Configuration
+
+Set colors in the provider config:
+
+<Tabs>
+  <Tab title="Vue">
+```javascript
+provideArtifactuse({
+  theme: 'dark',
+  colors: {
+    primary: '#6366f1',
+    background: '#111827',
+    surface: '#1f2937',
+    text: '#f3f4f6',
+  },
+})
+```
+  </Tab>
+  <Tab title="React">
+```jsx
+<ArtifactuseProvider config={{
+  theme: 'dark',
+  colors: {
+    primary: '#6366f1',
+    background: '#111827',
+    surface: '#1f2937',
+    text: '#f3f4f6',
+  },
+}}>
+```
+  </Tab>
+  <Tab title="Svelte">
+```javascript
+setArtifactuseContext({
+  theme: 'dark',
+  colors: {
+    primary: '#6366f1',
+    background: '#111827',
+    surface: '#1f2937',
+    text: '#f3f4f6',
+  },
+})
+```
+  </Tab>
+</Tabs>
+
+## Color Formats
+
+Both hex and RGB formats are supported:
+
+```javascript
+colors: {
+  primary: '#6366f1',      // 6-digit hex
+  surface: '#1f2937',      // 6-digit hex
+  text: '#fff',            // 3-digit shorthand
+  border: '75, 85, 99',    // RGB string
+}
+```
+
+Hex colors are auto-converted to RGB internally for `rgba()` support.
+
+## CSS Variables
+
+Override CSS custom properties directly:
+
+```css
+:root {
+  /* Primary colors */
+  --artifactuse-primary: 99, 102, 241;
+  --artifactuse-primary-hover: 79, 82, 221;
+  
+  /* Background */
+  --artifactuse-bg: 255, 255, 255;
+  --artifactuse-bg-secondary: 249, 250, 251;
+  --artifactuse-bg-tertiary: 243, 244, 246;
+  
+  /* Text */
+  --artifactuse-text: 17, 24, 39;
+  --artifactuse-text-secondary: 107, 114, 128;
+  --artifactuse-text-muted: 156, 163, 175;
+  
+  /* Border */
+  --artifactuse-border: 229, 231, 235;
+  --artifactuse-border-hover: 209, 213, 219;
+  
+  /* Status */
+  --artifactuse-success: 34, 197, 94;
+  --artifactuse-warning: 245, 158, 11;
+  --artifactuse-error: 239, 68, 68;
+  
+  /* Panel */
+  --artifactuse-panel-width: 500px;
+  
+  /* Border radius */
+  --artifactuse-radius-sm: 0.25rem;
+  --artifactuse-radius: 0.5rem;
+  --artifactuse-radius-lg: 0.75rem;
+}
+```
+
+## Dark Theme
+
+```css
+[data-theme="dark"] {
+  --artifactuse-bg: 17, 24, 39;
+  --artifactuse-bg-secondary: 31, 41, 55;
+  --artifactuse-bg-tertiary: 55, 65, 81;
+  
+  --artifactuse-text: 249, 250, 251;
+  --artifactuse-text-secondary: 156, 163, 175;
+  --artifactuse-text-muted: 107, 114, 128;
+  
+  --artifactuse-border: 55, 65, 81;
+  --artifactuse-border-hover: 75, 85, 99;
+}
+```
+
+## Custom Theme
+
+Create your own theme:
+
+```css
+[data-theme="brand"] {
+  --artifactuse-primary: 236, 72, 153;  /* Pink */
+  --artifactuse-bg: 15, 23, 42;
+  --artifactuse-text: 248, 250, 252;
+}
+```
+
+```javascript
+setTheme('brand')
+```
+
+## Panel Styling
+
+Customize the side panel:
+
+```css
+.artifactuse-panel {
+  --artifactuse-panel-width: 600px;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+}
+```
+
+## Syntax Highlighting
+
+Override code syntax colors:
+
+```css
+:root {
+  --artifactuse-syntax-keyword: 236, 72, 153;
+  --artifactuse-syntax-string: 34, 197, 94;
+  --artifactuse-syntax-number: 245, 158, 11;
+  --artifactuse-syntax-comment: 107, 114, 128;
+  --artifactuse-syntax-function: 99, 102, 241;
+}
+```

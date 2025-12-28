@@ -1,0 +1,99 @@
+---
+title: "Introduction"
+description: "The Artifact SDK for AI Agents."
+mode: "frame"
+keywords: ["overview", "platform", "getting started", "features", "artifacts", "sdk"]
+---
+
+export const HeroCard = ({ filename, title, description, href, icon }) => {
+  return (
+    <a className="group cursor-pointer pb-8" href={href}>
+    
+        <div
+            className="frame p-2 not-prose relative bg-gray-50/50 rounded-2xl overflow-hidden dark:bg-gray-800/25 group-hover:scale-105 transition-all duration-100"
+        >
+            <div
+                className="absolute inset-0 bg-grid-neutral-200/20 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
+            ></div>
+            <div className="relative rounded-xl overflow-hidden flex justify-center">
+                <div className="flex items-center justify-center h-[200px] md:w-64 lg:w-80 p-4 text-gray-400 dark:text-zinc-500  transition-colors duration-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-[70px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" dangerouslySetInnerHTML={{ __html: icon }}></svg>
+                </div>
+            </div>
+            <div className="absolute inset-0 pointer-events-none border border-black/5 rounded-2xl dark:border-white/5"></div>
+        </div>
+
+        <h3 className="mt-5 text-gray-900 dark:text-zinc-50 font-medium">
+            {title}
+        </h3>
+        <span className="mt-1.5">{description}</span>
+    </a>
+  );
+};
+
+
+
+
+<div className="relative">
+
+
+  <div className="relative z-10 px-4 py-16 lg:py-48 lg:pb-24 max-w-3xl mx-auto">
+    <h1 className="block text-4xl font-medium text-center text-gray-900 dark:text-zinc-50 tracking-tight">
+      Artifactuse Documentation
+    </h1>
+
+    <div className="max-w-xl mx-auto px-4 mt-4 text-lg text-center text-gray-500 dark:text-zinc-500">
+     Turn AI outputs into interactive experiences. Render code previews, canvas editors, video timelines, forms, and more—in any framework.
+    </div>
+
+    <div className="px-6 lg:px-0 mt-12 lg:mt-24 grid sm:grid-cols-2 gap-x-6 gap-y-4">
+      <HeroCard 
+        icon={'<polygon points="6 3 20 12 6 21 6 3"/>'} 
+        filename="Q" 
+        title="Quickstart" 
+        description="Install the SDK and render your first artifact in under 5 minutes" 
+        href="/getting-started/quickstart" 
+      />
+
+      <HeroCard
+        icon={'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>'} 
+        filename="C"
+        title="Code Artifacts"
+        description="Live previews for HTML, React, Vue, Svelte with hot reload"
+        href="/artifacts/code"
+      />
+
+      <HeroCard
+        icon={'<circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/>'} 
+        filename="D"
+        title="Canvas Editor"
+        description="Vector graphics, banners, logos, and diagrams with full editing"
+        href="/artifacts/canvas"
+      />
+
+      <HeroCard
+        icon={'<path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/>'} 
+        filename="V"
+        title="Video Editor"
+        description="Timeline-based editing with tracks, effects, and transitions"
+        href="/artifacts/video"
+      />
+
+      <HeroCard
+        icon={'<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>'} 
+        filename="S"
+        title="Social Previews"
+        description="Twitter, LinkedIn, Instagram, and Facebook post previews"
+        href="/artifacts/social"
+      />
+
+      <HeroCard
+        icon={'<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>'} 
+        filename="F"
+        title="Framework Guides"
+        description="React, Vue, Svelte, and Vanilla JS integration guides"
+        href="/frameworks/react"
+      />
+    </div>
+  </div>
+</div>

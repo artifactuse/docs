@@ -1,0 +1,184 @@
+---
+title: Video
+description: Create video intros, title sequences, and animations
+icon: "video"
+---
+
+<Note>
+  ⭐ **Pro Feature** - Video Editor requires a [Pro subscription](https://artifactuse.com/pricing).
+</Note>
+
+## Overview
+
+Video artifacts extend the canvas system with temporal properties. Each shape becomes a clip on a timeline.
+
+```video
+{
+  "width": 1920,
+  "height": 1080,
+  "duration": 10,
+  "backgroundColor": "#0a0a0f",
+  "shapes": [
+    {
+      "type": "text",
+      "x": 960, "y": 540,
+      "text": "WELCOME",
+      "fontSize": 120,
+      "color": "#ffffff",
+      "bold": true,
+      "align": "center",
+      "startTime": 0,
+      "duration": 4,
+      "trackId": "track-1"
+    }
+  ]
+}
+```
+
+## Structure
+
+```json
+{
+  "width": 1920,
+  "height": 1080,
+  "duration": 60,
+  "backgroundColor": "#000000",
+  "shapes": [...]
+}
+```
+
+## Temporal Properties
+
+Every shape has these additional properties:
+
+| Property | Description | Default |
+|----------|-------------|---------|
+| `startTime` | When shape appears (seconds) | 0 |
+| `duration` | How long visible (seconds) | 5 |
+| `trackId` | Track assignment | "track-1" |
+
+## Video Resolutions
+
+| Preset | Size | Use Case |
+|--------|------|----------|
+| 1080p | 1920 × 1080 | YouTube |
+| Vertical | 1080 × 1920 | TikTok, Reels |
+| Square | 1080 × 1080 | Instagram |
+| 720p | 1280 × 720 | Twitter |
+
+## Shapes
+
+All canvas shapes plus:
+
+| Type | Properties |
+|------|------------|
+| `video` | x, y, width, height, src |
+| `audio` | x, y, width, height, src |
+
+## Effects
+
+```json
+{
+  "type": "effect",
+  "subtype": "chromatic",
+  "name": "Chromatic Aberration",
+  "startTime": 0,
+  "duration": 5,
+  "trackId": "track-fx-1",
+  "intensity": 100,
+  "offset": 5
+}
+```
+
+Available effects: `dropShadow`, `glow`, `vignette`, `blur`, `grain`, `glitch`, `chromatic`, `pixelate`
+
+## Filters
+
+```json
+{
+  "type": "filter",
+  "subtype": "temperature",
+  "name": "Temperature",
+  "startTime": 0,
+  "duration": 5,
+  "trackId": "track-fx-1",
+  "value": 50
+}
+```
+
+| Filter | Min | Max | Default |
+|--------|-----|-----|---------|
+| brightness | 0 | 200 | 100 |
+| contrast | 0 | 200 | 100 |
+| saturation | 0 | 200 | 100 |
+| hue | 0 | 360 | 0 |
+| grayscale | 0 | 100 | 0 |
+| sepia | 0 | 100 | 0 |
+| temperature | -100 | 100 | 0 |
+
+## Transitions
+
+```json
+{
+  "type": "transition",
+  "subtype": "fade",
+  "name": "Fade",
+  "startTime": 0,
+  "duration": 1,
+  "trackId": "track-fx-1",
+  "easing": "ease-in-out"
+}
+```
+
+Available: `fade`, `dissolve`, `wipeLeft`, `wipeRight`, `wipeUp`, `wipeDown`, `slideLeft`, `slideRight`, `zoomIn`, `zoomOut`, `crossZoom`, `blur`
+
+## Tracks
+
+Organize clips on tracks:
+
+- `track-1`: Main content (titles)
+- `track-2`: Secondary (subtitles)
+- `track-3`: Background elements
+- `track-fx-*`: Effects/filters/transitions
+
+## Timing Tips
+
+| Element | Duration |
+|---------|----------|
+| Title cards | 3-5 seconds |
+| Lower thirds | 4-6 seconds |
+| Stagger delays | 0.3-0.5 seconds |
+| Total intro | 5-15 seconds |
+
+## Example: Title Sequence
+
+```json
+{
+  "width": 1920,
+  "height": 1080,
+  "duration": 15,
+  "backgroundColor": "#0a0a0f",
+  "shapes": [
+    {
+      "type": "text", "x": 960, "y": 540,
+      "text": "WELCOME", "fontSize": 120, "color": "#ffffff", "bold": true, "align": "center",
+      "startTime": 0, "duration": 4, "trackId": "track-1"
+    },
+    {
+      "type": "text", "x": 960, "y": 640,
+      "text": "to the show", "fontSize": 36, "color": "#888888", "align": "center",
+      "startTime": 1, "duration": 3, "trackId": "track-2"
+    },
+    {
+      "type": "rect", "x": 760, "y": 520, "width": 400, "height": 4,
+      "fillColor": "#e94560",
+      "startTime": 0.5, "duration": 3, "trackId": "track-3"
+    },
+    {
+      "type": "text", "x": 960, "y": 540,
+      "text": "Episode 1", "fontSize": 72, "color": "#ffffff", "align": "center",
+      "startTime": 5, "duration": 5, "trackId": "track-1"
+    }
+  ]
+}
+```

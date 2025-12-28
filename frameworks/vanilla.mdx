@@ -1,0 +1,222 @@
+---
+title: Vanilla JS
+description: Use Artifactuse without a framework
+icon: "js"
+---
+
+## Installation
+
+```bash
+npm install artifactuse
+```
+
+## Setup
+
+```javascript
+import { createArtifactuse } from 'artifactuse'
+import 'artifactuse/styles'
+
+const artifactuse = createArtifactuse({
+  theme: 'dark',
+  // cdnUrl defaults to https://cdn.artifactuse.com
+  // Set only if self-hosting panels
+})
+```
+
+## API
+
+### processMessage
+
+Process AI content and extract artifacts:
+
+```javascript
+const content = `
+Here's a banner:
+
+\`\`\`canvas
+{
+  "width": 800,
+  "height": 400,
+  "backgroundColor": "#1a1a2e",
+  "shapes": [
+    {"type": "text", "x": 400, "y": 200, "text": "Hello", "fontSize": 48, "color": "#fff", "align": "center"}
+  ]
+}
+\`\`\`
+`
+
+const { html, artifacts } = artifactuse.processMessage(content)
+document.getElementById('message').innerHTML = html
+```
+
+### openArtifact
+
+Open an artifact in the panel:
+
+```javascript
+artifactuse.openArtifact(artifacts[0])
+```
+
+### Panel Methods
+
+```javascript
+artifactuse.togglePanel()
+artifactuse.closePanel()
+artifactuse.toggleFullscreen()
+artifactuse.setViewMode('preview') // 'preview' | 'code' | 'split'
+```
+
+### Theme
+
+```javascript
+artifactuse.setTheme('dark')
+artifactuse.setTheme('light')
+
+const theme = artifactuse.getTheme()
+```
+
+## Events
+
+```javascript
+artifactuse.on('ai:request', async ({ prompt, context, requestId }) => {
+  const response = await yourAI.chat(prompt)
+})
+
+artifactuse.on('form:submit', ({ formId, values }) => {
+  console.log('Form submitted:', values)
+})
+
+artifactuse.on('social:copy', ({ platform, text }) => {
+  console.log('Copied:', platform, text)
+})
+
+artifactuse.on('save:request', ({ artifactId, data }) => {
+  await saveToCloud(artifactId, data)
+})
+
+artifactuse.on('export:complete', ({ artifactId, blob, filename }) => {
+  download(blob, filename)
+})
+```
+
+## Rendering
+
+### Render to Element
+
+```javascript
+// Render artifacts to a container
+artifactuse.render('#app', content)
+```
+
+### Manual Rendering
+
+```javascript
+const { html, artifacts } = artifactuse.processMessage(content)
+
+// Render message HTML
+document.getElementById('message').innerHTML = html
+
+// Render panel
+artifactuse.renderPanel('#panel')
+
+// Render toggle button
+artifactuse.renderToggle('#toggle')
+```
+
+## State
+
+```javascript
+// Get state
+const state = artifactuse.getState()
+
+// Reactive state (if using a reactive library)
+const { 
+  activeArtifact,
+  artifactCount,
+  hasArtifacts,
+  isPanelOpen,
+  isFullscreen,
+  viewMode
+} = artifactuse.state
+```
+
+## Full Example
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Artifactuse Vanilla JS</title>
+</head>
+<body>
+  <div id="chat"></div>
+  <div id="panel"></div>
+  <div id="toggle"></div>
+
+  <script type="module">
+    import { createArtifactuse } from 'artifactuse'
+    import 'artifactuse/styles'
+    
+    const artifactuse = createArtifactuse({
+      theme: 'dark',
+      // cdnUrl defaults to https://cdn.artifactuse.com
+      // Set only if self-hosting panels
+    })
+    
+    // Listen for events
+    artifactuse.on('form:submit', ({ formId, values }) => {
+      console.log('Form submitted:', values)
+    })
+    
+    artifactuse.on('ai:request', async ({ prompt, context }) => {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        body: JSON.stringify({ prompt, context })
+      })
+      return response.json()
+    })
+    
+    // Process and render messages
+    const content = await fetchAIResponse()
+    const { html, artifacts } = artifactuse.processMessage(content)
+    
+    document.getElementById('chat').innerHTML = html
+    artifactuse.renderPanel('#panel')
+    artifactuse.renderToggle('#toggle')
+  </script>
+</body>
+</html>
+```
+
+## Configuration
+
+```javascript
+const artifactuse = createArtifactuse({
+  // Theme
+  theme: 'dark', // 'dark' | 'light' | 'auto'
+  
+  // CDN URL for panel artifacts (optional)
+  // Defaults to https://cdn.artifactuse.com
+  // Set only if self-hosting panels
+  // cdnUrl: 'https://cdn.yourdomain.com',
+  
+  // Custom colors
+  colors: {
+    primary: '#6366f1',
+    background: '#111827',
+    surface: '#1f2937',
+    text: '#f3f4f6',
+  },
+  
+  // Enable/disable processors
+  processors: {
+    codeBlocks: true,
+    images: true,
+    videos: true,
+    audio: true,
+    maps: true,
+    social: true,
+    documents: true,
+  },
+})
+```

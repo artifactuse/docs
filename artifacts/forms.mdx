@@ -1,0 +1,167 @@
+---
+title: Forms
+description: Interactive forms, wizards, and quick actions
+icon: "layout-panel-top"
+---
+
+## Overview
+
+Form artifacts render interactive forms directly in the chat. Users can submit data back to the AI.
+
+```json
+{
+  "type": "form",
+  "variant": "fields",
+  "display": "inline",
+  "title": "Contact Us",
+  "submitLabel": "Send",
+  "data": {
+    "fields": [
+      {"name": "email", "type": "email", "label": "Email", "required": true},
+      {"name": "message", "type": "textarea", "label": "Message"}
+    ]
+  }
+}
+```
+
+## Variants
+
+### Fields
+
+Standard form with input fields:
+
+```json
+{
+  "type": "form",
+  "variant": "fields",
+  "display": "inline",
+  "title": "Feedback",
+  "data": {
+    "fields": [
+      {"name": "rating", "type": "rating", "label": "How was your experience?"},
+      {"name": "comments", "type": "textarea", "label": "Comments", "rows": 3}
+    ]
+  }
+}
+```
+
+### Wizard
+
+Multi-step form:
+
+```json
+{
+  "type": "form",
+  "variant": "wizard",
+  "display": "panel",
+  "title": "Setup Wizard",
+  "data": {
+    "steps": [
+      {
+        "title": "Account",
+        "fields": [
+          {"name": "email", "type": "email", "label": "Email", "required": true}
+        ]
+      },
+      {
+        "title": "Profile",
+        "fields": [
+          {"name": "name", "type": "text", "label": "Name", "required": true}
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Buttons
+
+Quick action buttons:
+
+```json
+{
+  "type": "form",
+  "variant": "buttons",
+  "display": "inline",
+  "description": "How would you like to proceed?",
+  "data": {
+    "buttons": [
+      {"id": "continue", "label": "Continue", "style": "primary"},
+      {"id": "cancel", "label": "Cancel", "style": "secondary"}
+    ]
+  }
+}
+```
+
+## Display Modes
+
+| Mode | When to Use |
+|------|-------------|
+| `inline` | Simple forms (1-3 fields), buttons |
+| `panel` | Complex forms, wizards, file uploads |
+
+## Field Types
+
+| Type | Description |
+|------|-------------|
+| `text` | Single-line text |
+| `email` | Email input |
+| `password` | Password input |
+| `number` | Numeric input |
+| `tel` | Phone number |
+| `url` | URL input |
+| `textarea` | Multi-line text |
+| `select` | Dropdown |
+| `radio` | Radio buttons |
+| `checkbox` | Checkbox |
+| `date` | Date picker |
+| `time` | Time picker |
+| `file` | File upload |
+| `rating` | Star rating |
+| `color` | Color picker |
+| `range` | Slider |
+
+## Field Properties
+
+```json
+{
+  "name": "username",
+  "type": "text",
+  "label": "Username",
+  "placeholder": "Enter username",
+  "required": true,
+  "disabled": false,
+  "defaultValue": "",
+  "helpText": "Must be unique",
+  "minLength": 3,
+  "maxLength": 20,
+  "pattern": "^[a-z0-9]+$"
+}
+```
+
+## Select/Radio Options
+
+```json
+{
+  "name": "country",
+  "type": "select",
+  "label": "Country",
+  "options": [
+    {"value": "us", "label": "United States"},
+    {"value": "uk", "label": "United Kingdom"},
+    {"value": "ca", "label": "Canada"}
+  ]
+}
+```
+
+## Handling Submissions
+
+```jsx
+<ArtifactuseAgentMessage
+  content={content}
+  onFormSubmit={(data) => {
+    console.log('Form submitted:', data)
+    // Send to AI or API
+  }}
+/>
+```

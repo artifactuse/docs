@@ -1,0 +1,194 @@
+---
+title: Quickstart
+description: Get up and running in 5 minutes
+icon: "rocket"
+---
+
+## Installation
+
+<CodeGroup>
+```bash npm
+npm install artifactuse
+```
+
+```bash yarn
+yarn add artifactuse
+```
+
+```bash pnpm
+pnpm add artifactuse
+```
+</CodeGroup>
+
+## Basic Usage
+
+<Tabs>
+  <Tab title="Vue 3">
+```vue
+<template>
+  <div class="chat">
+    <ArtifactuseAgentMessage 
+      :key="msg.id"
+      :content="msg.content"
+      :message-id="msg.id"
+      @form-submit="handleFormSubmit"
+      @social-copy="handleSocialCopy"
+    />
+  </div>
+  
+  <ArtifactusePanel @ai-request="handleAIRequest" />
+  <ArtifactusePanelToggle />
+</template>
+
+<script setup>
+import { 
+  ArtifactuseAgentMessage, 
+  ArtifactusePanel, 
+  ArtifactusePanelToggle,
+  provideArtifactuse 
+} from 'artifactuse/vue'
+import 'artifactuse/styles'
+
+provideArtifactuse({
+  theme: 'dark',
+  // cdnUrl defaults to https://cdn.artifactuse.com
+  // Set this only if self-hosting panels
+})
+
+const messages = ref([])
+
+function handleFormSubmit({ formId, values }) {
+  console.log('Form submitted:', formId, values)
+}
+
+function handleSocialCopy({ platform, text }) {
+  console.log('Copied:', platform, text)
+}
+
+async function handleAIRequest({ prompt, context }) {
+  const response = await yourAI.chat(prompt)
+}
+</script>
+```
+  </Tab>
+  <Tab title="React">
+```jsx
+import { 
+  ArtifactuseProvider,
+  ArtifactuseAgentMessage, 
+  ArtifactusePanel, 
+  ArtifactusePanelToggle 
+} from 'artifactuse/react'
+import 'artifactuse/styles'
+
+function App() {
+  return (
+    <ArtifactuseProvider config={{ theme: 'dark' }}>
+      <Chat />
+    </ArtifactuseProvider>
+  )
+}
+
+function Chat() {
+  const [messages, setMessages] = useState([])
+  
+  return (
+    <div className="chat">
+      {messages.map(msg => (
+        <ArtifactuseAgentMessage 
+          key={msg.id}
+          content={msg.content}
+          messageId={msg.id}
+          onFormSubmit={handleFormSubmit}
+          onSocialCopy={handleSocialCopy}
+        />
+      ))}
+      
+      <ArtifactusePanel onAIRequest={handleAIRequest} />
+      <ArtifactusePanelToggle />
+    </div>
+  )
+}
+```
+  </Tab>
+  <Tab title="Svelte">
+```svelte
+<!-- +layout.svelte -->
+<script>
+  import { setArtifactuseContext } from 'artifactuse/svelte'
+  import 'artifactuse/styles'
+  
+  setArtifactuseContext({ theme: 'dark' })
+</script>
+
+<slot />
+```
+
+```svelte
+<!-- Chat.svelte -->
+<script>
+  import { 
+    ArtifactuseAgentMessage, 
+    ArtifactusePanel, 
+    ArtifactusePanelToggle 
+  } from 'artifactuse/svelte'
+</script>
+
+{#each messages as msg (msg.id)}
+  <ArtifactuseAgentMessage 
+    content={msg.content}
+    messageId={msg.id}
+    on:formSubmit={handleFormSubmit}
+    on:socialCopy={handleSocialCopy}
+  />
+{/each}
+
+<ArtifactusePanel on:aiRequest={handleAIRequest} />
+<ArtifactusePanelToggle />
+```
+  </Tab>
+</Tabs>
+
+## Add AI Prompts
+
+Install the prompts package to teach your AI how to generate artifacts:
+
+```bash
+npm install @artifactuse/prompts
+```
+
+```javascript
+import { canvasPrompt, videoPrompt } from '@artifactuse/prompts'
+
+const systemPrompt = `
+You are a helpful assistant.
+
+${canvasPrompt}
+${videoPrompt}
+`
+
+const response = await openai.chat.completions.create({
+  model: 'gpt-4',
+  messages: [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: 'Create a YouTube thumbnail' }
+  ]
+})
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Frameworks" icon="layers" href="/frameworks/react">
+    Detailed setup for React, Vue, Svelte
+  </Card>
+  <Card title="Artifacts" icon="shapes" href="/artifacts/canvas">
+    Learn about each artifact type
+  </Card>
+  <Card title="AI Prompts" icon="sparkles" href="/prompts/overview">
+    Configure AI to generate artifacts
+  </Card>
+  <Card title="Theming" icon="palette" href="/theming">
+    Customize colors and styles
+  </Card>
+</CardGroup>

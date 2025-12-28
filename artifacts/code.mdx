@@ -1,0 +1,159 @@
+---
+title: Code
+description: HTML, React, Vue, JavaScript, Python, and more
+icon: "code"
+---
+
+## Overview
+
+Code artifacts render syntax-highlighted code with live preview and execution.
+
+## Supported Languages
+
+### Code Previews 🆓
+
+| Language | Code Block | Features |
+|----------|------------|----------|
+| HTML | ` ```html ` | Live preview in iframe |
+| React/JSX | ` ```jsx ` | Live component preview |
+| Vue | ` ```vue ` | SFC with preview |
+| JSON | ` ```json ` | Tree view, formatting |
+| SVG | ` ```svg ` | Live preview |
+| Diff | ` ```diff ` | Side-by-side view |
+
+### Code Runtime ⭐ Pro
+
+| Language | Code Block | Features |
+|----------|------------|----------|
+| JavaScript | ` ```javascript ` | Execution, console output |
+| Python | ` ```python ` | Pyodide execution |
+
+<Note>
+  ⭐ Code Runtime (JavaScript & Python execution) requires a [Pro subscription](https://artifactuse.com/pricing). Code Previews are free.
+</Note>
+
+## HTML
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: system-ui; padding: 2rem; }
+    h1 { color: #6366f1; }
+  </style>
+</head>
+<body>
+  <h1>Hello World</h1>
+</body>
+</html>
+```
+
+Renders in a sandboxed iframe. External CDNs allowed (Tailwind, etc.).
+
+## React / JSX
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0)
+  
+  return (
+    <div className="p-4 text-center">
+      <div className="text-4xl mb-4">{count}</div>
+      <button 
+        onClick={() => setCount(c => c + 1)}
+        className="px-4 py-2 bg-blue-500 text-white rounded"
+      >
+        Increment
+      </button>
+    </div>
+  )
+}
+```
+
+Available: React hooks, Tailwind CSS, Lucide icons, Recharts.
+
+## Vue
+
+```vue
+<template>
+  <div class="counter">
+    <button @click="count++">Count: {{ count }}</button>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+const count = ref(0)
+</script>
+
+<style scoped>
+.counter { padding: 1rem; }
+</style>
+```
+
+## JavaScript ⭐ Pro
+
+```javascript
+async function fetchData() {
+  const response = await fetch('https://api.example.com/data')
+  const data = await response.json()
+  console.log(data)
+}
+
+fetchData()
+```
+
+Console output (log, warn, error) is captured and displayed.
+
+## Python ⭐ Pro
+
+```python
+import numpy as np
+import pandas as pd
+
+data = {'name': ['Alice', 'Bob'], 'age': [25, 30]}
+df = pd.DataFrame(data)
+print(df)
+```
+
+Runs via Pyodide. Available: numpy, pandas, scipy, scikit-learn, matplotlib.
+
+## JSON
+
+```json
+{
+  "user": {
+    "id": 12345,
+    "name": "Jane Smith",
+    "roles": ["admin", "editor"]
+  }
+}
+```
+
+Features: tree view, collapse/expand, search, JSONPath.
+
+## SVG
+
+```svg
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="100" r="80" fill="#6366f1"/>
+  <text x="100" y="110" text-anchor="middle" fill="white" font-size="24">SVG</text>
+</svg>
+```
+
+## Diff
+
+```diff
+--- a/config.js
++++ b/config.js
+@@ -1,5 +1,6 @@
+ module.exports = {
+   name: 'my-app',
+-  version: '1.0.0',
++  version: '1.1.0',
++  author: 'John Doe',
+ }
+```
+
+Shows additions (green) and deletions (red) with side-by-side view option.

@@ -1,0 +1,256 @@
+---
+title: Vue
+description: Use Artifactuse with Vue 3 and Nuxt 3
+icon: "vuejs"
+---
+
+## Installation
+
+```bash
+npm install artifactuse
+```
+
+## Setup
+
+Initialize Artifactuse with `provideArtifactuse`:
+
+```vue
+<script setup>
+import { provideArtifactuse } from 'artifactuse/vue'
+import 'artifactuse/styles'
+
+provideArtifactuse({
+  theme: 'dark',
+  // cdnUrl defaults to https://cdn.artifactuse.com
+  // Set only if self-hosting panels
+})
+</script>
+```
+
+## Components
+
+### ArtifactuseAgentMessage
+
+Renders AI messages with automatic artifact detection.
+
+```vue
+<template>
+  <ArtifactuseAgentMessage 
+    :content="message.content"
+    :message-id="message.id"
+    @artifact-detected="onDetected"
+    @artifact-open="onOpen"
+    @form-submit="onFormSubmit"
+    @form-cancel="onFormCancel"
+    @social-copy="onSocialCopy"
+  />
+</template>
+
+<script setup>
+import { ArtifactuseAgentMessage } from 'artifactuse/vue'
+
+function onFormSubmit({ formId, values }) {
+  console.log('Form submitted:', values)
+}
+
+function onSocialCopy({ platform, text }) {
+  console.log('Copied:', platform, text)
+}
+</script>
+```
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `content` | `string` | Raw message content from AI |
+| `messageId` | `string` | Unique message identifier |
+| `inlineCards` | `boolean` | Show artifact cards inline (default: true) |
+
+### ArtifactusePanel
+
+Side panel for viewing artifact previews and code.
+
+```vue
+<template>
+  <ArtifactusePanel 
+    @ai-request="handleAIRequest"
+    @save="handleSave"
+    @export="handleExport"
+    @form-submit="handleFormSubmit"
+  />
+</template>
+
+<script setup>
+import { ArtifactusePanel } from 'artifactuse/vue'
+
+async function handleAIRequest({ prompt, context, requestId }) {
+  const response = await yourAI.chat(prompt)
+}
+</script>
+```
+
+### ArtifactusePanelToggle
+
+Toggle button with artifact count badge.
+
+```vue
+<template>
+  <ArtifactusePanelToggle />
+</template>
+
+<script setup>
+import { ArtifactusePanelToggle } from 'artifactuse/vue'
+</script>
+```
+
+## Composables
+
+### useArtifactuse
+
+Access Artifactuse state and methods:
+
+```vue
+<script setup>
+import { useArtifactuse } from 'artifactuse/vue'
+
+const {
+  // State (reactive)
+  state,
+  activeArtifact,
+  artifactCount,
+  hasArtifacts,
+  
+  // Methods
+  processMessage,
+  openArtifact,
+  closePanel,
+  togglePanel,
+  toggleFullscreen,
+  setViewMode,      // 'preview' | 'code' | 'split'
+  getPanelUrl,
+  getTheme,
+  setTheme,
+  
+  // Events
+  on,
+  off,
+} = useArtifactuse()
+</script>
+
+<template>
+  <button @click="togglePanel">
+    Artifacts ({{ artifactCount }})
+  </button>
+</template>
+```
+
+## Events
+
+```vue
+<script setup>
+import { useArtifactuse } from 'artifactuse/vue'
+import { onMounted, onUnmounted } from 'vue'
+
+const { on } = useArtifactuse()
+
+onMounted(() => {
+  on('ai:request', async ({ prompt, context }) => {
+    const response = await yourAI.chat(prompt)
+  })
+  
+  on('form:submit', ({ formId, values }) => {
+    console.log('Form submitted:', values)
+  })
+  
+  on('social:copy', ({ platform, text }) => {
+    console.log('Copied:', platform, text)
+  })
+})
+</script>
+```
+
+## Vue 2
+
+For Vue 2 projects, import from `artifactuse/vue2`:
+
+```vue
+<script>
+import { 
+  ArtifactuseAgentMessage,
+  ArtifactusePanel,
+  ArtifactusePanelToggle,
+  provideArtifactuse 
+} from 'artifactuse/vue2'
+import 'artifactuse/styles'
+
+export default {
+  components: {
+    ArtifactuseAgentMessage,
+    ArtifactusePanel,
+    ArtifactusePanelToggle
+  },
+  setup() {
+    provideArtifactuse({ theme: 'dark' })
+  }
+}
+</script>
+```
+
+Requires `@vue/composition-api`:
+
+```bash
+npm install @vue/composition-api
+```
+
+## Full Example
+
+```vue
+<template>
+  <div class="chat">
+    <ArtifactuseAgentMessage 
+      v-for="msg in messages" 
+      :key="msg.id"
+      :content="msg.content"
+      :message-id="msg.id"
+      @form-submit="handleFormSubmit"
+      @social-copy="handleSocialCopy"
+    />
+  </div>
+  
+  <ArtifactusePanel @ai-request="handleAIRequest" />
+  <ArtifactusePanelToggle />
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { 
+  ArtifactuseAgentMessage, 
+  ArtifactusePanel, 
+  ArtifactusePanelToggle,
+  provideArtifactuse,
+  useArtifactuse
+} from 'artifactuse/vue'
+import 'artifactuse/styles'
+
+provideArtifactuse({
+  theme: 'dark',
+  // cdnUrl defaults to https://cdn.artifactuse.com
+  // Set only if self-hosting panels
+})
+
+const messages = ref([])
+const { on } = useArtifactuse()
+
+function handleFormSubmit({ formId, values }) {
+  // Send form data back to AI
+  sendMessage(`Form submitted: ${JSON.stringify(values)}`)
+}
+
+function handleSocialCopy({ platform, text }) {
+  console.log('Copied:', platform, text)
+}
+
+async function handleAIRequest({ prompt, context }) {
+  const response = await yourAI.chat(prompt)
+}
+</script>
+```

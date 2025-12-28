@@ -1,0 +1,101 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "almond",
+  "name": "Artifactuse",
+  "colors": {
+    "primary": "#6366f1",
+    "light": "#f5f3ed",
+    "dark": "#6366f1"
+  },
+  "favicon": "/favicon.png",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/artifactuse"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get Started",
+      "href": "https://app.artifactuse.com/signup"
+    }
+  },
+  "navigation": {
+    "interaction": {
+      "drilldown": true
+    },
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "getting-started/introduction",
+              "getting-started/quickstart",
+              "getting-started/examples"
+            ]
+          },
+          {
+            "group": "Frameworks",
+            "pages": [
+              "frameworks/react",
+              "frameworks/vue",
+              "frameworks/svelte",
+              "frameworks/vanilla"
+            ]
+          },
+          {
+            "group": "Artifacts",
+            "pages": [
+              "artifacts/canvas",
+              "artifacts/video",
+              "artifacts/code",
+              "artifacts/forms",
+              "artifacts/social"
+            ]
+          },
+          {
+            "group": "AI Prompts",
+            "pages": [
+              "prompts/overview"
+            ]
+          },
+          {
+            "group": "Customization",
+            "pages": [
+              "theming",
+              "cdn"
+
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Changelog",
+        "groups": [
+          {
+            "group": "Updates",
+            "pages": [
+              "changelog"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/artifactusehq",
+      "github": "https://github.com/artifactuse"
+    }
+  }
+}

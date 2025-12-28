@@ -1,0 +1,137 @@
+---
+title: Canvas
+description: Create graphics, banners, logos, and diagrams
+icon: "paintbrush"
+---
+
+<Note>
+  ⭐ **Pro Feature** - Canvas Editor requires a [Pro subscription](https://artifactuse.com/pricing).
+</Note>
+
+## Overview
+
+Canvas artifacts render interactive graphics that users can edit, export, and customize.
+
+```canvas
+{
+  "width": 1200,
+  "height": 630,
+  "backgroundColor": "#1a1a2e",
+  "shapes": [
+    {"type": "circle", "x": 1000, "y": 100, "radius": 200, "fillColor": "#e94560", "opacity": 20},
+    {"type": "text", "x": 100, "y": 300, "text": "Hello World", "fontSize": 64, "color": "#ffffff", "bold": true}
+  ]
+}
+```
+
+## Structure
+
+```json
+{
+  "width": 1200,
+  "height": 630,
+  "backgroundColor": "#1a1a2e",
+  "shapes": [...]
+}
+```
+
+## Shapes
+
+### Basic Shapes
+
+| Type | Properties |
+|------|------------|
+| `rect` | x, y, width, height |
+| `circle` | x, y, radius |
+| `ellipse` | x, y, radiusX, radiusY |
+| `diamond` | x, y, width, height |
+| `triangle` | x1, y1, x2, y2, x3, y3 |
+| `line` | x1, y1, x2, y2 |
+| `arrow` | x1, y1, x2, y2, arrowType |
+| `text` | x, y, text, fontSize, align |
+| `image` | x, y, width, height, src |
+
+### Path (Custom Shapes)
+
+Draw any shape using bezier curves:
+
+```json
+{
+  "type": "path",
+  "segments": [
+    {"point": [200, 280], "handleOut": [-60, -60]},
+    {"point": [120, 180], "handleIn": [0, 40], "handleOut": [0, -40]},
+    {"point": [200, 120], "handleIn": [-40, 0], "handleOut": [40, 0]},
+    {"point": [280, 180], "handleIn": [0, -40], "handleOut": [0, 40]},
+    {"point": [200, 280], "handleIn": [60, -60]}
+  ],
+  "closed": true,
+  "fillColor": "#e94560"
+}
+```
+
+### Frames & Groups
+
+```json
+// Frame - clips content, never rotates
+{"type": "frame", "name": "Card", "x": 100, "y": 100, "width": 300, "height": 200, "children": [...]}
+
+// Group - can rotate
+{"type": "group", "rotation": 0.5, "children": [...]}
+```
+
+## Common Properties
+
+| Property | Description |
+|----------|-------------|
+| `color` | Stroke color (`"transparent"` for none) |
+| `fillColor` | Fill color |
+| `opacity` | 0-100 |
+| `lineWidth` | 1, 2, or 4 |
+| `strokeStyle` | `solid`, `dashed`, `dotted` |
+| `rotation` | Radians (not on frames) |
+
+## Canvas Sizes
+
+| Use Case | Size |
+|----------|------|
+| YouTube Thumbnail | 1280 × 720 |
+| Instagram Post | 1080 × 1080 |
+| Instagram Story | 1080 × 1920 |
+| Social Banner | 1200 × 630 |
+| Logo | 500 × 500 |
+
+## User Features
+
+### Vector Editing
+
+Users can double-click any shape to edit vector points:
+- Drag anchor points to reshape
+- Drag bezier handles to adjust curves
+- Click path to add points
+- Delete key removes points
+
+### Boolean Operations
+
+Combine shapes with:
+- **Union** (Ctrl+Alt+U) - Merge shapes
+- **Subtract** (Ctrl+Alt+S) - Cut one from another
+- **Intersect** (Ctrl+Alt+I) - Keep overlap only
+- **Exclude** (Ctrl+Alt+E) - Remove overlap
+
+## Example
+
+```json
+{
+  "width": 1200,
+  "height": 630,
+  "backgroundColor": "#1a1a2e",
+  "shapes": [
+    {"type": "circle", "x": 1100, "y": 100, "radius": 250, "fillColor": "#e94560", "opacity": 15},
+    {"type": "circle", "x": 150, "y": 550, "radius": 200, "fillColor": "#0f3460", "opacity": 30},
+    {"type": "rect", "x": 80, "y": 240, "width": 60, "height": 6, "fillColor": "#e94560"},
+    {"type": "text", "x": 80, "y": 290, "text": "YOUR HEADLINE", "color": "#ffffff", "fontSize": 56, "bold": true},
+    {"type": "text", "x": 80, "y": 360, "text": "Supporting text", "color": "#a0a0a0", "fontSize": 22}
+  ]
+}
+```

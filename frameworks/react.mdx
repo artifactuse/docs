@@ -1,0 +1,193 @@
+---
+title: React
+description: Use Artifactuse with React and Next.js
+icon: "react"
+---
+
+## Installation
+
+```bash
+npm install artifactuse
+```
+
+## Setup
+
+Wrap your app with `ArtifactuseProvider`:
+
+```jsx
+import { ArtifactuseProvider } from 'artifactuse/react'
+import 'artifactuse/styles'
+
+function App() {
+  return (
+    <ArtifactuseProvider config={{ 
+      theme: 'dark',
+      // cdnUrl defaults to https://cdn.artifactuse.com
+      // Set only if self-hosting panels
+    }}>
+      <YourApp />
+    </ArtifactuseProvider>
+  )
+}
+```
+
+## Components
+
+### ArtifactuseAgentMessage
+
+Renders AI messages with automatic artifact detection. Inline artifacts (forms, social previews) render directly. Panel artifacts show as clickable cards.
+
+```jsx
+<ArtifactuseAgentMessage 
+  content={message.content}
+  messageId={message.id}
+  onArtifactDetected={(artifacts) => console.log(artifacts)}
+  onArtifactOpen={(artifact) => console.log('Opened:', artifact)}
+  onFormSubmit={({ formId, values }) => console.log(values)}
+  onFormCancel={({ formId }) => console.log('Cancelled')}
+  onSocialCopy={({ platform, text }) => console.log('Copied')}
+/>
+```
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `content` | `string` | Raw message content from AI |
+| `messageId` | `string` | Unique message identifier |
+| `inlineCards` | `boolean` | Show artifact cards inline (default: true) |
+
+### ArtifactusePanel
+
+Side panel for viewing artifact previews and code.
+
+```jsx
+<ArtifactusePanel 
+  onAIRequest={async ({ prompt, context, requestId }) => {
+    const response = await yourAI.chat(prompt)
+  }}
+  onSave={({ artifactId, data }) => saveToCloud(data)}
+  onExport={({ artifactId, blob, filename }) => download(blob)}
+  onFormSubmit={({ formId, values }) => handleSubmit(values)}
+/>
+```
+
+### ArtifactusePanelToggle
+
+Toggle button with artifact count badge.
+
+```jsx
+<ArtifactusePanelToggle />
+```
+
+## Hooks
+
+### useArtifactuse
+
+Access Artifactuse state and methods:
+
+```jsx
+import { useArtifactuse } from 'artifactuse/react'
+
+function MyComponent() {
+  const {
+    // State
+    state,
+    activeArtifact,
+    artifactCount,
+    hasArtifacts,
+    
+    // Methods
+    processMessage,
+    openArtifact,
+    closePanel,
+    togglePanel,
+    toggleFullscreen,
+    setViewMode,      // 'preview' | 'code' | 'split'
+    getPanelUrl,
+    getTheme,
+    setTheme,
+    
+    // Events
+    on,
+    off,
+  } = useArtifactuse()
+  
+  return (
+    <button onClick={togglePanel}>
+      Artifacts ({artifactCount})
+    </button>
+  )
+}
+```
+
+## Events
+
+```jsx
+const { on } = useArtifactuse()
+
+useEffect(() => {
+  const unsubscribe = on('ai:request', async ({ prompt, context }) => {
+    const response = await yourAI.chat(prompt)
+  })
+  
+  return unsubscribe
+}, [])
+```
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `ai:request` | `{ prompt, context, requestId }` | AI assistance requested |
+| `save:request` | `{ artifactId, data }` | Save requested |
+| `export:complete` | `{ artifactId, blob, filename }` | Export completed |
+| `form:submit` | `{ formId, action, values }` | Form submitted |
+| `form:cancel` | `{ formId }` | Form cancelled |
+| `social:copy` | `{ platform, text }` | Social text copied |
+
+## Full Example
+
+```jsx
+import { 
+  ArtifactuseProvider,
+  ArtifactuseAgentMessage, 
+  ArtifactusePanel, 
+  ArtifactusePanelToggle,
+  useArtifactuse 
+} from 'artifactuse/react'
+import 'artifactuse/styles'
+
+function App() {
+  return (
+    <ArtifactuseProvider config={{ theme: 'dark' }}>
+      <Chat />
+    </ArtifactuseProvider>
+  )
+}
+
+function Chat() {
+  const [messages, setMessages] = useState([])
+  const { on } = useArtifactuse()
+  
+  useEffect(() => {
+    on('form:submit', ({ formId, values }) => {
+      // Send form data back to AI
+      sendMessage(`Form submitted: ${JSON.stringify(values)}`)
+    })
+  }, [])
+  
+  return (
+    <div className="flex">
+      <div className="flex-1">
+        {messages.map(msg => (
+          <ArtifactuseAgentMessage 
+            key={msg.id}
+            content={msg.content}
+            messageId={msg.id}
+          />
+        ))}
+      </div>
+      
+      <ArtifactusePanel />
+      <ArtifactusePanelToggle />
+    </div>
+  )
+}
+```

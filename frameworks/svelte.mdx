@@ -1,0 +1,221 @@
+---
+title: Svelte
+description: Use Artifactuse with Svelte and SvelteKit
+icon: "code"
+---
+
+## Installation
+
+```bash
+npm install artifactuse
+```
+
+## Setup
+
+Initialize Artifactuse with `setArtifactuseContext` in your layout:
+
+```svelte
+<!-- +layout.svelte -->
+<script>
+  import { setArtifactuseContext } from 'artifactuse/svelte'
+  import 'artifactuse/styles'
+  
+  setArtifactuseContext({ 
+    theme: 'dark',
+    // cdnUrl defaults to https://cdn.artifactuse.com
+    // Set only if self-hosting panels
+  })
+</script>
+
+<slot />
+```
+
+## Components
+
+### ArtifactuseAgentMessage
+
+Renders AI messages with automatic artifact detection.
+
+```svelte
+<script>
+  import { ArtifactuseAgentMessage } from 'artifactuse/svelte'
+  
+  export let message
+  
+  function handleFormSubmit(event) {
+    const { formId, values } = event.detail
+    console.log('Form submitted:', values)
+  }
+  
+  function handleSocialCopy(event) {
+    const { platform, text } = event.detail
+    console.log('Copied:', platform, text)
+  }
+</script>
+
+<ArtifactuseAgentMessage 
+  content={message.content}
+  messageId={message.id}
+  on:artifactDetected={(e) => console.log(e.detail)}
+  on:artifactOpen={(e) => console.log('Opened:', e.detail)}
+  on:formSubmit={handleFormSubmit}
+  on:formCancel={(e) => console.log('Cancelled')}
+  on:socialCopy={handleSocialCopy}
+/>
+```
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `content` | `string` | Raw message content from AI |
+| `messageId` | `string` | Unique message identifier |
+| `inlineCards` | `boolean` | Show artifact cards inline (default: true) |
+
+### ArtifactusePanel
+
+Side panel for viewing artifact previews and code.
+
+```svelte
+<script>
+  import { ArtifactusePanel } from 'artifactuse/svelte'
+  
+  async function handleAIRequest(event) {
+    const { prompt, context, requestId } = event.detail
+    const response = await yourAI.chat(prompt)
+  }
+</script>
+
+<ArtifactusePanel 
+  on:aiRequest={handleAIRequest}
+  on:save={(e) => saveToCloud(e.detail)}
+  on:export={(e) => download(e.detail.blob)}
+  on:formSubmit={(e) => handleSubmit(e.detail)}
+/>
+```
+
+### ArtifactusePanelToggle
+
+Toggle button with artifact count badge.
+
+```svelte
+<script>
+  import { ArtifactusePanelToggle } from 'artifactuse/svelte'
+</script>
+
+<ArtifactusePanelToggle />
+```
+
+## Context
+
+### getArtifactuseContext
+
+Access Artifactuse state and methods:
+
+```svelte
+<script>
+  import { getArtifactuseContext } from 'artifactuse/svelte'
+  
+  const {
+    // Stores (reactive)
+    state,
+    activeArtifact,
+    artifactCount,
+    hasArtifacts,
+    
+    // Methods
+    processMessage,
+    openArtifact,
+    closePanel,
+    togglePanel,
+    toggleFullscreen,
+    setViewMode,      // 'preview' | 'code' | 'split'
+    getPanelUrl,
+    getTheme,
+    setTheme,
+    
+    // Events
+    on,
+    off,
+  } = getArtifactuseContext()
+</script>
+
+<button on:click={togglePanel}>
+  Artifacts ({$artifactCount})
+</button>
+```
+
+## Events
+
+```svelte
+<script>
+  import { getArtifactuseContext } from 'artifactuse/svelte'
+  import { onMount } from 'svelte'
+  
+  const { on } = getArtifactuseContext()
+  
+  onMount(() => {
+    on('ai:request', async ({ prompt, context }) => {
+      const response = await yourAI.chat(prompt)
+    })
+    
+    on('form:submit', ({ formId, values }) => {
+      console.log('Form submitted:', values)
+    })
+    
+    on('social:copy', ({ platform, text }) => {
+      console.log('Copied:', platform, text)
+    })
+  })
+</script>
+```
+
+## Full Example
+
+```svelte
+<!-- +page.svelte -->
+<script>
+  import { 
+    ArtifactuseAgentMessage, 
+    ArtifactusePanel, 
+    ArtifactusePanelToggle,
+    getArtifactuseContext
+  } from 'artifactuse/svelte'
+  import { onMount } from 'svelte'
+  
+  let messages = []
+  
+  const { on } = getArtifactuseContext()
+  
+  onMount(() => {
+    on('form:submit', ({ formId, values }) => {
+      sendMessage(`Form submitted: ${JSON.stringify(values)}`)
+    })
+  })
+  
+  function handleFormSubmit(event) {
+    console.log('Form:', event.detail)
+  }
+  
+  function handleSocialCopy(event) {
+    console.log('Copied:', event.detail)
+  }
+  
+  async function handleAIRequest(event) {
+    const { prompt, context } = event.detail
+    const response = await yourAI.chat(prompt)
+  }
+</script>
+
+<div class="chat">
+  {#each messages as msg (msg.id)}
+    <ArtifactuseAgentMessage 
+      content={msg.content}
+      messageId={msg.id}
+      on:formSubmit={handleFormSubmit}
+      on:socialCopy={handleSocialCopy}
+    />
+  {/each}
+</div>
+
+<ArtifactusePanel on:aiRequest={handleAIRequest} />
+<ArtifactusePanelToggle />
+```
