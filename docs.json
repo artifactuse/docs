@@ -1,6 +1,9 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "almond",
+   "styles": [
+    "/styles.css"
+  ],
   "name": "Artifactuse",
   "colors": {
     "primary": "#6366f1",
