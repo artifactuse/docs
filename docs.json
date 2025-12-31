@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "almond",
-   "styles": [
+  "styles": [
     "/styles.css"
   ],
   "name": "Artifactuse",
@@ -57,6 +57,14 @@
             ]
           },
           {
+            "group": "Components",
+            "pages": [
+              "components/agent-message",
+              "components/panel",
+              "components/panel-toggle"
+            ]
+          },
+          {
             "group": "Artifacts",
             "pages": [
               "artifacts/canvas",
@@ -77,7 +85,6 @@
             "pages": [
               "theming",
               "cdn"
-
             ]
           }
         ]

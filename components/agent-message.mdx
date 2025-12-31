@@ -1,0 +1,239 @@
+---
+title: ArtifactuseAgentMessage
+description: Render AI messages with automatic artifact detection
+icon: "message-square"
+---
+
+The main component for rendering AI-generated content. Automatically detects and renders artifacts including code blocks, forms, social previews, images, videos, and more.
+
+## Import
+
+<Tabs>
+  <Tab title="Vue 3">
+```js
+import { ArtifactuseAgentMessage } from 'artifactuse/vue'
+```
+  </Tab>
+  <Tab title="Vue 2">
+```js
+import { ArtifactuseAgentMessage } from 'artifactuse/vue2'
+```
+  </Tab>
+  <Tab title="React">
+```js
+import { ArtifactuseAgentMessage } from 'artifactuse/react'
+```
+  </Tab>
+  <Tab title="Svelte">
+```js
+import { ArtifactuseAgentMessage } from 'artifactuse/svelte'
+```
+  </Tab>
+</Tabs>
+
+## Usage
+
+<Tabs>
+  <Tab title="Vue">
+```vue
+<template>
+  <ArtifactuseAgentMessage 
+    :content="message.content"
+    :message-id="message.id"
+    :typing="isStreaming"
+    @artifact-detected="onDetected"
+    @artifact-open="onOpen"
+    @form-submit="onFormSubmit"
+    @form-cancel="onFormCancel"
+    @social-copy="onSocialCopy"
+    @media-open="onMediaOpen"
+  />
+</template>
+```
+  </Tab>
+  <Tab title="React">
+```jsx
+<ArtifactuseAgentMessage 
+  content={message.content}
+  messageId={message.id}
+  typing={isStreaming}
+  onArtifactDetected={onDetected}
+  onArtifactOpen={onOpen}
+  onFormSubmit={onFormSubmit}
+  onFormCancel={onFormCancel}
+  onSocialCopy={onSocialCopy}
+  onMediaOpen={onMediaOpen}
+/>
+```
+  </Tab>
+  <Tab title="Svelte">
+```svelte
+<ArtifactuseAgentMessage 
+  content={message.content}
+  messageId={message.id}
+  typing={isStreaming}
+  on:artifactDetected={onDetected}
+  on:artifactOpen={onOpen}
+  on:formSubmit={onFormSubmit}
+  on:formCancel={onFormCancel}
+  on:socialCopy={onSocialCopy}
+  on:mediaOpen={onMediaOpen}
+/>
+```
+  </Tab>
+</Tabs>
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `content` | `string` | Required | Raw message content from AI (Markdown, code blocks, JSON artifacts) |
+| `messageId` | `string` | Required | Unique identifier for the message |
+| `typing` | `boolean` | `false` | Show typing indicator (use while streaming) |
+| `inlineCards` | `boolean` | `true` | Show clickable cards for panel artifacts inline |
+
+## Events
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `artifact-detected` | `Artifact[]` | Fired when artifacts are detected in content |
+| `artifact-open` | `Artifact` | Fired when user clicks an artifact card to open panel |
+| `form-submit` | `{ formId, values }` | Fired when an inline form is submitted |
+| `form-cancel` | `{ formId }` | Fired when an inline form is cancelled |
+| `social-copy` | `{ platform, text }` | Fired when social preview text is copied |
+| `media-open` | `{ type, src, alt, caption }` | Fired when image/PDF is opened in lightbox viewer |
+
+<Note>
+  Event names use kebab-case in Vue (`@form-submit`) and camelCase in React (`onFormSubmit`). Svelte uses camelCase with `on:` prefix (`on:formSubmit`).
+</Note>
+
+## Artifact Rendering
+
+The component automatically renders different artifact types:
+
+| Artifact Type | Rendering |
+|---------------|-----------|
+| `code` (HTML, React, Vue, etc.) | Clickable card → Opens in Panel |
+| `form` with `display: "inline"` | Inline form directly in message |
+| `form` with `display: "panel"` | Clickable card → Opens in Panel |
+| `social` | Inline social media preview |
+| Images | Inline with lightbox on click |
+| Videos | Inline embed (YouTube, Vimeo, etc.) |
+| Other embeds | Inline (maps, documents, etc.) |
+
+## Media Lightbox
+
+Images and PDFs automatically open in a fullscreen lightbox viewer when clicked. The viewer supports:
+
+- **Zoom** - Click image or zoom button to toggle zoom
+- **Download** - Download the original file
+- **Keyboard** - Press `Escape` to close
+- **Click outside** - Click overlay to close
+
+```vue
+<ArtifactuseAgentMessage 
+  :content="content"
+  :message-id="id"
+  @media-open="({ type, src }) => console.log('Opened:', type, src)"
+/>
+```
+
+## Typing Indicator
+
+Show a typing indicator while streaming AI responses:
+
+```vue
+<ArtifactuseAgentMessage 
+  :content="partialContent"
+  :message-id="id"
+  :typing="isStreaming"
+/>
+```
+
+The typing indicator displays animated loading bars that disappear when `typing` becomes `false`.
+
+## Example: Full Integration
+
+<Tabs>
+  <Tab title="Vue">
+```vue
+<template>
+  <div class="chat">
+    <ArtifactuseAgentMessage 
+      v-for="msg in messages"
+      :key="msg.id"
+      :content="msg.content"
+      :message-id="msg.id"
+      :typing="msg.isStreaming"
+      @form-submit="handleFormSubmit"
+      @social-copy="handleSocialCopy"
+      @media-open="handleMediaOpen"
+    />
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { ArtifactuseAgentMessage } from 'artifactuse/vue'
+
+const messages = ref([])
+
+function handleFormSubmit({ formId, values }) {
+  // Send form data back to AI
+  sendToAI(`User submitted form: ${JSON.stringify(values)}`)
+}
+
+function handleSocialCopy({ platform, text }) {
+  // Track analytics
+  analytics.track('social_copy', { platform })
+}
+
+function handleMediaOpen({ type, src }) {
+  // Track media views
+  analytics.track('media_view', { type, src })
+}
+</script>
+```
+  </Tab>
+  <Tab title="React">
+```jsx
+import { useState } from 'react'
+import { ArtifactuseAgentMessage } from 'artifactuse/react'
+
+function Chat() {
+  const [messages, setMessages] = useState([])
+
+  const handleFormSubmit = ({ formId, values }) => {
+    // Send form data back to AI
+    sendToAI(`User submitted form: ${JSON.stringify(values)}`)
+  }
+
+  const handleSocialCopy = ({ platform, text }) => {
+    // Track analytics
+    analytics.track('social_copy', { platform })
+  }
+
+  const handleMediaOpen = ({ type, src }) => {
+    // Track media views
+    analytics.track('media_view', { type, src })
+  }
+
+  return (
+    <div className="chat">
+      {messages.map(msg => (
+        <ArtifactuseAgentMessage 
+          key={msg.id}
+          content={msg.content}
+          messageId={msg.id}
+          typing={msg.isStreaming}
+          onFormSubmit={handleFormSubmit}
+          onSocialCopy={handleSocialCopy}
+          onMediaOpen={handleMediaOpen}
+        />
+      ))}
+    </div>
+  )
+}
+```
+  </Tab>
+</Tabs>

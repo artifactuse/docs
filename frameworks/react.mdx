@@ -22,8 +22,7 @@ function App() {
   return (
     <ArtifactuseProvider config={{ 
       theme: 'dark',
-      // cdnUrl defaults to https://cdn.artifactuse.com
-      // Set only if self-hosting panels
+      // branding: true, // Set to false to hide "Powered by Artifactuse" (requires license)
     }}>
       <YourApp />
     </ArtifactuseProvider>
@@ -31,50 +30,61 @@ function App() {
 }
 ```
 
-## Components
+## Syntax Highlighting (Optional)
 
-### ArtifactuseAgentMessage
+For code syntax highlighting, add Prism.js:
 
-Renders AI messages with automatic artifact detection. Inline artifacts (forms, social previews) render directly. Panel artifacts show as clickable cards.
+```bash
+npm install prismjs
+```
 
 ```jsx
+// In your app entry (e.g., App.jsx or _app.jsx)
+import Prism from 'prismjs'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-typescript'
+import 'prismjs/components/prism-python'
+import 'prismjs/themes/prism-tomorrow.css' // or any theme
+```
+
+## Components
+
+<CardGroup cols={3}>
+  <Card title="ArtifactuseAgentMessage" icon="message-square" href="/components/agent-message">
+    Render AI messages with artifact detection
+  </Card>
+  <Card title="ArtifactusePanel" icon="panel-right" href="/components/panel">
+    Side panel for previews and code
+  </Card>
+  <Card title="ArtifactusePanelToggle" icon="toggle-right" href="/components/panel-toggle">
+    Toggle button with badge
+  </Card>
+</CardGroup>
+
+### Quick Reference
+
+```jsx
+import { 
+  ArtifactuseAgentMessage, 
+  ArtifactusePanel, 
+  ArtifactusePanelToggle 
+} from 'artifactuse/react'
+
 <ArtifactuseAgentMessage 
   content={message.content}
   messageId={message.id}
-  onArtifactDetected={(artifacts) => console.log(artifacts)}
-  onArtifactOpen={(artifact) => console.log('Opened:', artifact)}
-  onFormSubmit={({ formId, values }) => console.log(values)}
-  onFormCancel={({ formId }) => console.log('Cancelled')}
-  onSocialCopy={({ platform, text }) => console.log('Copied')}
+  typing={isStreaming}
+  onFormSubmit={({ formId, values }) => {}}
+  onSocialCopy={({ platform, text }) => {}}
+  onMediaOpen={({ type, src }) => {}}
 />
-```
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `content` | `string` | Raw message content from AI |
-| `messageId` | `string` | Unique message identifier |
-| `inlineCards` | `boolean` | Show artifact cards inline (default: true) |
-
-### ArtifactusePanel
-
-Side panel for viewing artifact previews and code.
-
-```jsx
 <ArtifactusePanel 
-  onAIRequest={async ({ prompt, context, requestId }) => {
-    const response = await yourAI.chat(prompt)
-  }}
-  onSave={({ artifactId, data }) => saveToCloud(data)}
-  onExport={({ artifactId, blob, filename }) => download(blob)}
-  onFormSubmit={({ formId, values }) => handleSubmit(values)}
+  onAIRequest={async ({ prompt, context }) => {}}
+  onSave={({ artifactId, data }) => {}}
+  onExport={({ artifactId, blob, filename }) => {}}
 />
-```
 
-### ArtifactusePanelToggle
-
-Toggle button with artifact count badge.
-
-```jsx
 <ArtifactusePanelToggle />
 ```
 
@@ -141,10 +151,12 @@ useEffect(() => {
 | `form:submit` | `{ formId, action, values }` | Form submitted |
 | `form:cancel` | `{ formId }` | Form cancelled |
 | `social:copy` | `{ platform, text }` | Social text copied |
+| `media:open` | `{ type, src, alt, caption }` | Media opened in lightbox |
 
 ## Full Example
 
 ```jsx
+import { useState, useEffect } from 'react'
 import { 
   ArtifactuseProvider,
   ArtifactuseAgentMessage, 
@@ -153,10 +165,19 @@ import {
   useArtifactuse 
 } from 'artifactuse/react'
 import 'artifactuse/styles'
+import './styles.css'
+
+// Optional: Prism.js for syntax highlighting
+import Prism from 'prismjs'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/themes/prism-tomorrow.css'
 
 function App() {
   return (
-    <ArtifactuseProvider config={{ theme: 'dark' }}>
+    <ArtifactuseProvider config={{ 
+      theme: 'dark',
+      // branding: true, // Set to false to hide branding (requires license)
+    }}>
       <Chat />
     </ArtifactuseProvider>
   )
@@ -174,20 +195,45 @@ function Chat() {
   }, [])
   
   return (
-    <div className="flex">
-      <div className="flex-1">
+    <div className="app-container">
+      <div className="chat">
         {messages.map(msg => (
           <ArtifactuseAgentMessage 
             key={msg.id}
             content={msg.content}
             messageId={msg.id}
+            typing={msg.isStreaming}
           />
         ))}
+        
+        <ArtifactusePanelToggle />
       </div>
       
       <ArtifactusePanel />
-      <ArtifactusePanelToggle />
     </div>
   )
+}
+```
+
+```css
+/* styles.css */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-container {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+.chat {
+  flex: 1;
+  padding: 20px;
+  min-width: 0;
+  overflow-y: auto;
 }
 ```

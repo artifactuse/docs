@@ -21,84 +21,76 @@ import 'artifactuse/styles'
 
 provideArtifactuse({
   theme: 'dark',
-  // cdnUrl defaults to https://cdn.artifactuse.com
-  // Set only if self-hosting panels
+  // branding: true, // Set to false to hide "Powered by Artifactuse" (requires license)
 })
+</script>
+```
+
+## Syntax Highlighting (Optional)
+
+For code syntax highlighting, add Prism.js:
+
+```bash
+npm install prismjs
+```
+
+```vue
+<script setup>
+import Prism from 'prismjs'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-typescript'
+import 'prismjs/components/prism-python'
+import 'prismjs/themes/prism-tomorrow.css' // or any theme
+
+import { provideArtifactuse } from 'artifactuse/vue'
+import 'artifactuse/styles'
+
+provideArtifactuse({ theme: 'dark' })
 </script>
 ```
 
 ## Components
 
-### ArtifactuseAgentMessage
+<CardGroup cols={3}>
+  <Card title="ArtifactuseAgentMessage" icon="message-square" href="/components/agent-message">
+    Render AI messages with artifact detection
+  </Card>
+  <Card title="ArtifactusePanel" icon="panel-right" href="/components/panel">
+    Side panel for previews and code
+  </Card>
+  <Card title="ArtifactusePanelToggle" icon="toggle-right" href="/components/panel-toggle">
+    Toggle button with badge
+  </Card>
+</CardGroup>
 
-Renders AI messages with automatic artifact detection.
+### Quick Reference
 
 ```vue
 <template>
   <ArtifactuseAgentMessage 
     :content="message.content"
     :message-id="message.id"
-    @artifact-detected="onDetected"
-    @artifact-open="onOpen"
+    :typing="isStreaming"
     @form-submit="onFormSubmit"
-    @form-cancel="onFormCancel"
     @social-copy="onSocialCopy"
+    @media-open="onMediaOpen"
   />
-</template>
 
-<script setup>
-import { ArtifactuseAgentMessage } from 'artifactuse/vue'
-
-function onFormSubmit({ formId, values }) {
-  console.log('Form submitted:', values)
-}
-
-function onSocialCopy({ platform, text }) {
-  console.log('Copied:', platform, text)
-}
-</script>
-```
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `content` | `string` | Raw message content from AI |
-| `messageId` | `string` | Unique message identifier |
-| `inlineCards` | `boolean` | Show artifact cards inline (default: true) |
-
-### ArtifactusePanel
-
-Side panel for viewing artifact previews and code.
-
-```vue
-<template>
   <ArtifactusePanel 
     @ai-request="handleAIRequest"
     @save="handleSave"
     @export="handleExport"
-    @form-submit="handleFormSubmit"
   />
-</template>
 
-<script setup>
-import { ArtifactusePanel } from 'artifactuse/vue'
-
-async function handleAIRequest({ prompt, context, requestId }) {
-  const response = await yourAI.chat(prompt)
-}
-</script>
-```
-
-### ArtifactusePanelToggle
-
-Toggle button with artifact count badge.
-
-```vue
-<template>
   <ArtifactusePanelToggle />
 </template>
 
 <script setup>
-import { ArtifactusePanelToggle } from 'artifactuse/vue'
+import { 
+  ArtifactuseAgentMessage, 
+  ArtifactusePanel, 
+  ArtifactusePanelToggle 
+} from 'artifactuse/vue'
 </script>
 ```
 
@@ -164,6 +156,10 @@ onMounted(() => {
   on('social:copy', ({ platform, text }) => {
     console.log('Copied:', platform, text)
   })
+  
+  on('media:open', ({ type, src }) => {
+    console.log('Media opened:', type, src)
+  })
 })
 </script>
 ```
@@ -173,6 +169,30 @@ onMounted(() => {
 For Vue 2 projects, import from `artifactuse/vue2`:
 
 ```vue
+<template>
+  <div class="app-container">
+    <div class="chat">
+      <ArtifactuseAgentMessage 
+        v-for="msg in messages" 
+        :key="msg.id"
+        :content="msg.content"
+        :message-id="msg.id"
+        :typing="msg.isStreaming"
+        @form-submit="handleFormSubmit"
+        @social-copy="handleSocialCopy"
+        @media-open="handleMediaOpen"
+      />
+      
+      <ArtifactusePanelToggle />
+    </div>
+    
+    <ArtifactusePanel @ai-request="handleAIRequest" />
+    
+    <!-- Required: Portal target for fullscreen/mobile -->
+    <portal-target name="artifactuse" />
+  </div>
+</template>
+
 <script>
 import { 
   ArtifactuseAgentMessage,
@@ -189,35 +209,114 @@ export default {
     ArtifactusePanelToggle
   },
   setup() {
-    provideArtifactuse({ theme: 'dark' })
+    provideArtifactuse({ 
+      theme: 'dark',
+      // branding: true, // Set to false to hide branding (requires license)
+    })
+    
+    // ... your setup code
   }
 }
 </script>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+#app {
+  height: 100%;
+}
+
+.app-container {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+.chat {
+  flex: 1;
+  padding: 20px;
+  min-width: 0;
+  overflow-y: auto;
+}
+</style>
 ```
 
-Requires `@vue/composition-api`:
+### Vue 2.6 + @vue/composition-api
 
-```bash
-npm install @vue/composition-api
+If you're using Vue 2.6 with `@vue/composition-api` or `@nuxtjs/composition-api`, add this alias to your build config:
+
+<Tabs>
+  <Tab title="Nuxt 2">
+```js
+// nuxt.config.js
+export default {
+  build: {
+    extend(config) {
+      config.resolve.alias['vue'] = '@vue/composition-api';
+    }
+  }
+}
 ```
+  </Tab>
+  <Tab title="Webpack">
+```js
+// webpack.config.js
+module.exports = {
+  resolve: {
+    alias: {
+      'vue': '@vue/composition-api'
+    }
+  }
+}
+```
+  </Tab>
+  <Tab title="Vue CLI">
+```js
+// vue.config.js
+module.exports = {
+  configureWebpack: {
+    resolve: {
+      alias: {
+        'vue': '@vue/composition-api'
+      }
+    }
+  }
+}
+```
+  </Tab>
+</Tabs>
+
+<Note>
+  Vue 2.7+ has the Composition API built-in and works without any alias configuration.
+</Note>
 
 ## Full Example
 
 ```vue
 <template>
-  <div class="chat">
-    <ArtifactuseAgentMessage 
-      v-for="msg in messages" 
-      :key="msg.id"
-      :content="msg.content"
-      :message-id="msg.id"
-      @form-submit="handleFormSubmit"
-      @social-copy="handleSocialCopy"
-    />
+  <div class="app-container">
+    <div class="chat">
+      <ArtifactuseAgentMessage 
+        v-for="msg in messages" 
+        :key="msg.id"
+        :content="msg.content"
+        :message-id="msg.id"
+        :typing="msg.isStreaming"
+        @form-submit="handleFormSubmit"
+        @social-copy="handleSocialCopy"
+        @media-open="handleMediaOpen"
+      />
+      
+      <ArtifactusePanelToggle />
+    </div>
+    
+    <ArtifactusePanel @ai-request="handleAIRequest" />
   </div>
-  
-  <ArtifactusePanel @ai-request="handleAIRequest" />
-  <ArtifactusePanelToggle />
 </template>
 
 <script setup>
@@ -226,19 +325,21 @@ import {
   ArtifactuseAgentMessage, 
   ArtifactusePanel, 
   ArtifactusePanelToggle,
-  provideArtifactuse,
-  useArtifactuse
+  provideArtifactuse
 } from 'artifactuse/vue'
 import 'artifactuse/styles'
 
+// Optional: Prism.js for syntax highlighting
+import Prism from 'prismjs'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/themes/prism-tomorrow.css'
+
 provideArtifactuse({
   theme: 'dark',
-  // cdnUrl defaults to https://cdn.artifactuse.com
-  // Set only if self-hosting panels
+  // branding: true, // Set to false to hide branding (requires license)
 })
 
 const messages = ref([])
-const { on } = useArtifactuse()
 
 function handleFormSubmit({ formId, values }) {
   // Send form data back to AI
@@ -249,8 +350,38 @@ function handleSocialCopy({ platform, text }) {
   console.log('Copied:', platform, text)
 }
 
+function handleMediaOpen({ type, src }) {
+  console.log('Media opened:', type, src)
+}
+
 async function handleAIRequest({ prompt, context }) {
   const response = await yourAI.chat(prompt)
 }
 </script>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+#app {
+  height: 100%;
+}
+
+.app-container {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+.chat {
+  flex: 1;
+  padding: 20px;
+  min-width: 0;
+  overflow-y: auto;
+}
+</style>
 ```

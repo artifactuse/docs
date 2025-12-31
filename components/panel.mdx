@@ -1,0 +1,243 @@
+---
+title: ArtifactusePanel
+description: Side panel for artifact preview and code view
+icon: "panel-right"
+---
+
+The side panel component that displays artifact previews, code, and interactive editors. Supports preview mode, code mode, split view, fullscreen, and resizing.
+
+## Import
+
+<Tabs>
+  <Tab title="Vue 3">
+```js
+import { ArtifactusePanel } from 'artifactuse/vue'
+```
+  </Tab>
+  <Tab title="Vue 2">
+```js
+import { ArtifactusePanel } from 'artifactuse/vue2'
+```
+  </Tab>
+  <Tab title="React">
+```js
+import { ArtifactusePanel } from 'artifactuse/react'
+```
+  </Tab>
+  <Tab title="Svelte">
+```js
+import { ArtifactusePanel } from 'artifactuse/svelte'
+```
+  </Tab>
+</Tabs>
+
+## Usage
+
+<Tabs>
+  <Tab title="Vue">
+```vue
+<template>
+  <div class="app-container">
+    <div class="chat">
+      <!-- Your chat messages -->
+    </div>
+    
+    <ArtifactusePanel 
+      @ai-request="handleAIRequest"
+      @save="handleSave"
+      @export="handleExport"
+      @form-submit="handleFormSubmit"
+    />
+  </div>
+</template>
+```
+  </Tab>
+  <Tab title="React">
+```jsx
+<div className="app-container">
+  <div className="chat">
+    {/* Your chat messages */}
+  </div>
+  
+  <ArtifactusePanel 
+    onAIRequest={handleAIRequest}
+    onSave={handleSave}
+    onExport={handleExport}
+    onFormSubmit={handleFormSubmit}
+  />
+</div>
+```
+  </Tab>
+  <Tab title="Svelte">
+```svelte
+<div class="app-container">
+  <div class="chat">
+    <!-- Your chat messages -->
+  </div>
+  
+  <ArtifactusePanel 
+    on:aiRequest={handleAIRequest}
+    on:save={handleSave}
+    on:export={handleExport}
+    on:formSubmit={handleFormSubmit}
+  />
+</div>
+```
+  </Tab>
+</Tabs>
+
+## Layout
+
+The panel should be a sibling to your chat container in a flex layout:
+
+```css
+.app-container {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+.chat {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+```
+
+The panel automatically positions itself on the right side and is resizable.
+
+## Events
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `ai-request` | `{ prompt, context, requestId }` | AI assistance requested from panel (e.g., "Fix this code") |
+| `save` | `{ artifactId, data }` | Save requested for current artifact |
+| `export` | `{ artifactId, blob, filename }` | Export completed |
+| `form-submit` | `{ formId, action, values }` | Panel form submitted |
+
+## Handling AI Requests
+
+When users request AI assistance from the panel (e.g., clicking "Fix", "Improve", or using the AI input), handle it like this:
+
+<Tabs>
+  <Tab title="Vue">
+```vue
+<script setup>
+async function handleAIRequest({ prompt, context, requestId }) {
+  // context contains the current artifact code/content
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4',
+    messages: [
+      { role: 'system', content: 'You are a helpful coding assistant.' },
+      { role: 'user', content: `${prompt}\n\nContext:\n${context}` }
+    ]
+  })
+  
+  // The response will be processed and update the artifact
+}
+</script>
+
+<template>
+  <ArtifactusePanel @ai-request="handleAIRequest" />
+</template>
+```
+  </Tab>
+  <Tab title="React">
+```jsx
+const handleAIRequest = async ({ prompt, context, requestId }) => {
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4',
+    messages: [
+      { role: 'system', content: 'You are a helpful coding assistant.' },
+      { role: 'user', content: `${prompt}\n\nContext:\n${context}` }
+    ]
+  })
+}
+
+<ArtifactusePanel onAIRequest={handleAIRequest} />
+```
+  </Tab>
+</Tabs>
+
+## View Modes
+
+The panel supports three view modes:
+
+| Mode | Description |
+|------|-------------|
+| `preview` | Live preview of the artifact (default for HTML, React, Vue) |
+| `code` | Syntax-highlighted code view |
+| `split` | Side-by-side preview and code |
+
+Control view mode programmatically:
+
+```js
+const { setViewMode } = useArtifactuse()
+
+setViewMode('preview')
+setViewMode('code')
+setViewMode('split')
+```
+
+## Fullscreen
+
+Toggle fullscreen mode:
+
+```js
+const { toggleFullscreen } = useArtifactuse()
+
+toggleFullscreen()
+```
+
+## Panel Controls
+
+The panel header includes:
+
+- **View mode tabs** - Switch between preview/code/split
+- **Fullscreen button** - Expand to full screen
+- **Close button** - Close the panel
+
+The panel footer includes:
+
+- **Branding** - "Powered by Artifactuse" (can be hidden with license)
+- **Navigation** - Previous/next artifact buttons
+- **Actions** - Copy, download, export buttons
+
+## Artifact Navigation
+
+When multiple artifacts exist, users can navigate between them using the footer controls or programmatically:
+
+```js
+const { openArtifact, state } = useArtifactuse()
+
+// Open specific artifact
+openArtifact(artifact)
+
+// Access all artifacts
+const allArtifacts = state.artifacts
+```
+
+## Mobile Behavior
+
+On mobile devices (< 768px), the panel:
+
+- Opens as a full-screen overlay
+- Hides the resize handle
+- Shows a backdrop behind the panel
+- Uses vertical split in split mode
+
+## Vue 2 Portal
+
+For Vue 2, the panel uses `portal-vue` for fullscreen/mobile rendering. Add the portal target:
+
+```vue
+<template>
+  <div class="app-container">
+    <div class="chat">...</div>
+    <ArtifactusePanel />
+    
+    <!-- Required for Vue 2 -->
+    <portal-target name="artifactuse" />
+  </div>
+</template>
+```

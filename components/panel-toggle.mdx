@@ -1,0 +1,229 @@
+---
+title: ArtifactusePanelToggle
+description: Toggle button with artifact count badge
+icon: "toggle-right"
+---
+
+A button component that toggles the panel visibility and displays a badge with the artifact count. Includes a pulse animation when new artifacts are detected.
+
+## Import
+
+<Tabs>
+  <Tab title="Vue 3">
+```js
+import { ArtifactusePanelToggle } from 'artifactuse/vue'
+```
+  </Tab>
+  <Tab title="Vue 2">
+```js
+import { ArtifactusePanelToggle } from 'artifactuse/vue2'
+```
+  </Tab>
+  <Tab title="React">
+```js
+import { ArtifactusePanelToggle } from 'artifactuse/react'
+```
+  </Tab>
+  <Tab title="Svelte">
+```js
+import { ArtifactusePanelToggle } from 'artifactuse/svelte'
+```
+  </Tab>
+</Tabs>
+
+## Usage
+
+<Tabs>
+  <Tab title="Vue">
+```vue
+<template>
+  <div class="chat-header">
+    <h1>Chat</h1>
+    <ArtifactusePanelToggle />
+  </div>
+</template>
+
+<script setup>
+import { ArtifactusePanelToggle } from 'artifactuse/vue'
+</script>
+```
+  </Tab>
+  <Tab title="React">
+```jsx
+import { ArtifactusePanelToggle } from 'artifactuse/react'
+
+function ChatHeader() {
+  return (
+    <div className="chat-header">
+      <h1>Chat</h1>
+      <ArtifactusePanelToggle />
+    </div>
+  )
+}
+```
+  </Tab>
+  <Tab title="Svelte">
+```svelte
+<script>
+  import { ArtifactusePanelToggle } from 'artifactuse/svelte'
+</script>
+
+<div class="chat-header">
+  <h1>Chat</h1>
+  <ArtifactusePanelToggle />
+</div>
+```
+  </Tab>
+</Tabs>
+
+## Behavior
+
+The toggle button automatically:
+
+- **Shows artifact count** - Badge displays number of detected artifacts
+- **Indicates active state** - Highlighted when panel is open
+- **Pulses on new artifacts** - Animated pulse when artifacts are first detected
+- **Toggles panel** - Click to open/close the panel
+
+## States
+
+| State | Appearance |
+|-------|------------|
+| No artifacts | Muted icon, no badge |
+| Has artifacts (panel closed) | Primary color icon, badge with count, pulse animation |
+| Has artifacts (panel open) | Active background, primary color |
+
+## Custom Toggle
+
+If you need a custom toggle button, use the `useArtifactuse` hook/composable:
+
+<Tabs>
+  <Tab title="Vue">
+```vue
+<template>
+  <button 
+    @click="togglePanel" 
+    :class="{ active: state.isPanelOpen }"
+  >
+    <span v-if="hasArtifacts">{{ artifactCount }} artifacts</span>
+    <span v-else>No artifacts</span>
+  </button>
+</template>
+
+<script setup>
+import { useArtifactuse } from 'artifactuse/vue'
+
+const { 
+  state, 
+  togglePanel, 
+  hasArtifacts, 
+  artifactCount 
+} = useArtifactuse()
+</script>
+```
+  </Tab>
+  <Tab title="React">
+```jsx
+import { useArtifactuse } from 'artifactuse/react'
+
+function CustomToggle() {
+  const { 
+    state, 
+    togglePanel, 
+    hasArtifacts, 
+    artifactCount 
+  } = useArtifactuse()
+
+  return (
+    <button 
+      onClick={togglePanel}
+      className={state.isPanelOpen ? 'active' : ''}
+    >
+      {hasArtifacts ? `${artifactCount} artifacts` : 'No artifacts'}
+    </button>
+  )
+}
+```
+  </Tab>
+  <Tab title="Svelte">
+```svelte
+<script>
+  import { getArtifactuseContext } from 'artifactuse/svelte'
+
+  const { 
+    state, 
+    togglePanel, 
+    hasArtifacts, 
+    artifactCount 
+  } = getArtifactuseContext()
+</script>
+
+<button 
+  on:click={togglePanel}
+  class:active={$state.isPanelOpen}
+>
+  {#if $hasArtifacts}
+    {$artifactCount} artifacts
+  {:else}
+    No artifacts
+  {/if}
+</button>
+```
+  </Tab>
+</Tabs>
+
+## Styling
+
+The default toggle uses these CSS classes:
+
+```css
+.artifactuse-panel-toggle {
+  /* Base button styles */
+}
+
+.artifactuse-panel-toggle--active {
+  /* When panel is open */
+}
+
+.artifactuse-panel-toggle--has-artifacts {
+  /* When artifacts exist */
+}
+
+.artifactuse-panel-toggle-badge {
+  /* Artifact count badge */
+}
+```
+
+Override with CSS variables:
+
+```css
+.artifactuse-panel-toggle {
+  --artifactuse-primary: 99, 102, 241;
+}
+```
+
+## Placement
+
+Common placement patterns:
+
+```css
+/* In chat header */
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Fixed position */
+.artifactuse-panel-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+/* In toolbar */
+.toolbar {
+  display: flex;
+  gap: 8px;
+}
+```

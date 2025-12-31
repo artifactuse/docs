@@ -12,7 +12,8 @@ Artifactuse is a lightweight SDK that transforms AI-generated content into rich,
 
 - 🎨 **Rich Content Detection** - Automatically detect and render code blocks, images, videos, maps, embeds
 - 📦 **Artifact Cards** - Beautiful inline cards for panel artifacts
-- 🖼️ **Panel Viewer** - Side panel with preview, code view, and split mode
+- 🖼️ **Media Lightbox** - Click images and PDFs to view fullscreen with zoom and download
+- 🖥️ **Panel Viewer** - Side panel with preview, code view, and split mode
 - 📝 **Interactive Forms** - Inline and panel forms with 17+ field types
 - 📱 **Social Previews** - Platform-accurate previews for Twitter, LinkedIn, Instagram
 - 🌗 **Theme Support** - Dark/light mode with customizable colors
@@ -54,7 +55,7 @@ Render directly in the message:
 <CardGroup cols={3}>
   <Card title="Forms" icon="layout-panel-top">Quick inputs, buttons</Card>
   <Card title="Social" icon="share-2">7 platform previews</Card>
-  <Card title="Images" icon="image">Auto-detected URLs</Card>
+  <Card title="Images" icon="image">Auto-detected with lightbox</Card>
   <Card title="Videos" icon="play">YouTube, Vimeo, Loom</Card>
   <Card title="Maps" icon="map">Google Maps, OpenStreetMap</Card>
   <Card title="Embeds" icon="app-window-mac">Figma, CodePen, 20+ more</Card>
@@ -76,6 +77,7 @@ AI Response → processMessage()
     │ type: social         → <SocialPreview> │
     │ type: code           → <Card> → Panel │
     │ type: form + panel   → <Card> → Panel │
+    │ images/PDFs          → <Viewer> lightbox │
     └─────────────────────────────────────┘
 ```
 

@@ -18,9 +18,27 @@ import 'artifactuse/styles'
 
 const artifactuse = createArtifactuse({
   theme: 'dark',
-  // cdnUrl defaults to https://cdn.artifactuse.com
-  // Set only if self-hosting panels
+  // branding: true, // Set to false to hide "Powered by Artifactuse" (requires license)
 })
+```
+
+## Syntax Highlighting (Optional)
+
+For code syntax highlighting, add Prism.js:
+
+```javascript
+import Prism from 'prismjs'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-python'
+import 'prismjs/themes/prism-tomorrow.css' // or any theme
+```
+
+Or via CDN:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-javascript.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.css" rel="stylesheet" />
 ```
 
 ## API
@@ -147,11 +165,39 @@ const {
 <html>
 <head>
   <title>Artifactuse Vanilla JS</title>
+  <!-- Optional: Prism.js for syntax highlighting -->
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-javascript.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.css" rel="stylesheet" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    .app-container {
+      display: flex;
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    .chat {
+      flex: 1;
+      padding: 20px;
+      min-width: 0;
+      overflow-y: auto;
+    }
+  </style>
 </head>
 <body>
-  <div id="chat"></div>
-  <div id="panel"></div>
-  <div id="toggle"></div>
+  <div class="app-container">
+    <div class="chat" id="chat">
+      <div id="toggle"></div>
+    </div>
+    <div id="panel"></div>
+  </div>
 
   <script type="module">
     import { createArtifactuse } from 'artifactuse'
@@ -159,8 +205,7 @@ const {
     
     const artifactuse = createArtifactuse({
       theme: 'dark',
-      // cdnUrl defaults to https://cdn.artifactuse.com
-      // Set only if self-hosting panels
+      // branding: true, // Set to false to hide "Powered by Artifactuse" (requires license)
     })
     
     // Listen for events
@@ -180,7 +225,7 @@ const {
     const content = await fetchAIResponse()
     const { html, artifacts } = artifactuse.processMessage(content)
     
-    document.getElementById('chat').innerHTML = html
+    document.getElementById('chat').insertAdjacentHTML('afterbegin', html)
     artifactuse.renderPanel('#panel')
     artifactuse.renderToggle('#toggle')
   </script>
@@ -194,6 +239,10 @@ const {
 const artifactuse = createArtifactuse({
   // Theme
   theme: 'dark', // 'dark' | 'light' | 'auto'
+  
+  // Show "Powered by Artifactuse" branding in panel footer
+  // Set to false to hide (requires paid license)
+  branding: true,
   
   // CDN URL for panel artifacts (optional)
   // Defaults to https://cdn.artifactuse.com

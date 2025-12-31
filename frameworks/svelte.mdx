@@ -22,9 +22,34 @@ Initialize Artifactuse with `setArtifactuseContext` in your layout:
   
   setArtifactuseContext({ 
     theme: 'dark',
-    // cdnUrl defaults to https://cdn.artifactuse.com
-    // Set only if self-hosting panels
+    // branding: true, // Set to false to hide "Powered by Artifactuse" (requires license)
   })
+</script>
+
+<slot />
+```
+
+## Syntax Highlighting (Optional)
+
+For code syntax highlighting, add Prism.js:
+
+```bash
+npm install prismjs
+```
+
+```svelte
+<!-- +layout.svelte -->
+<script>
+  import Prism from 'prismjs'
+  import 'prismjs/components/prism-javascript'
+  import 'prismjs/components/prism-typescript'
+  import 'prismjs/components/prism-python'
+  import 'prismjs/themes/prism-tomorrow.css' // or any theme
+  
+  import { setArtifactuseContext } from 'artifactuse/svelte'
+  import 'artifactuse/styles'
+  
+  setArtifactuseContext({ theme: 'dark' })
 </script>
 
 <slot />
@@ -32,74 +57,43 @@ Initialize Artifactuse with `setArtifactuseContext` in your layout:
 
 ## Components
 
-### ArtifactuseAgentMessage
+<CardGroup cols={3}>
+  <Card title="ArtifactuseAgentMessage" icon="message-square" href="/components/agent-message">
+    Render AI messages with artifact detection
+  </Card>
+  <Card title="ArtifactusePanel" icon="panel-right" href="/components/panel">
+    Side panel for previews and code
+  </Card>
+  <Card title="ArtifactusePanelToggle" icon="toggle-right" href="/components/panel-toggle">
+    Toggle button with badge
+  </Card>
+</CardGroup>
 
-Renders AI messages with automatic artifact detection.
+### Quick Reference
 
 ```svelte
 <script>
-  import { ArtifactuseAgentMessage } from 'artifactuse/svelte'
-  
-  export let message
-  
-  function handleFormSubmit(event) {
-    const { formId, values } = event.detail
-    console.log('Form submitted:', values)
-  }
-  
-  function handleSocialCopy(event) {
-    const { platform, text } = event.detail
-    console.log('Copied:', platform, text)
-  }
+  import { 
+    ArtifactuseAgentMessage, 
+    ArtifactusePanel, 
+    ArtifactusePanelToggle 
+  } from 'artifactuse/svelte'
 </script>
 
 <ArtifactuseAgentMessage 
   content={message.content}
   messageId={message.id}
-  on:artifactDetected={(e) => console.log(e.detail)}
-  on:artifactOpen={(e) => console.log('Opened:', e.detail)}
+  typing={isStreaming}
   on:formSubmit={handleFormSubmit}
-  on:formCancel={(e) => console.log('Cancelled')}
   on:socialCopy={handleSocialCopy}
+  on:mediaOpen={handleMediaOpen}
 />
-```
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `content` | `string` | Raw message content from AI |
-| `messageId` | `string` | Unique message identifier |
-| `inlineCards` | `boolean` | Show artifact cards inline (default: true) |
-
-### ArtifactusePanel
-
-Side panel for viewing artifact previews and code.
-
-```svelte
-<script>
-  import { ArtifactusePanel } from 'artifactuse/svelte'
-  
-  async function handleAIRequest(event) {
-    const { prompt, context, requestId } = event.detail
-    const response = await yourAI.chat(prompt)
-  }
-</script>
 
 <ArtifactusePanel 
   on:aiRequest={handleAIRequest}
-  on:save={(e) => saveToCloud(e.detail)}
-  on:export={(e) => download(e.detail.blob)}
-  on:formSubmit={(e) => handleSubmit(e.detail)}
+  on:save={handleSave}
+  on:export={handleExport}
 />
-```
-
-### ArtifactusePanelToggle
-
-Toggle button with artifact count badge.
-
-```svelte
-<script>
-  import { ArtifactusePanelToggle } from 'artifactuse/svelte'
-</script>
 
 <ArtifactusePanelToggle />
 ```
@@ -164,6 +158,10 @@ Access Artifactuse state and methods:
     on('social:copy', ({ platform, text }) => {
       console.log('Copied:', platform, text)
     })
+    
+    on('media:open', ({ type, src }) => {
+      console.log('Media opened:', type, src)
+    })
   })
 </script>
 ```
@@ -180,6 +178,11 @@ Access Artifactuse state and methods:
     getArtifactuseContext
   } from 'artifactuse/svelte'
   import { onMount } from 'svelte'
+  
+  // Optional: Prism.js for syntax highlighting
+  import Prism from 'prismjs'
+  import 'prismjs/components/prism-javascript'
+  import 'prismjs/themes/prism-tomorrow.css'
   
   let messages = []
   
@@ -199,23 +202,47 @@ Access Artifactuse state and methods:
     console.log('Copied:', event.detail)
   }
   
+  function handleMediaOpen(event) {
+    console.log('Media opened:', event.detail)
+  }
+  
   async function handleAIRequest(event) {
     const { prompt, context } = event.detail
     const response = await yourAI.chat(prompt)
   }
 </script>
 
-<div class="chat">
-  {#each messages as msg (msg.id)}
-    <ArtifactuseAgentMessage 
-      content={msg.content}
-      messageId={msg.id}
-      on:formSubmit={handleFormSubmit}
-      on:socialCopy={handleSocialCopy}
-    />
-  {/each}
+<div class="app-container">
+  <div class="chat">
+    {#each messages as msg (msg.id)}
+      <ArtifactuseAgentMessage 
+        content={msg.content}
+        messageId={msg.id}
+        typing={msg.isStreaming}
+        on:formSubmit={handleFormSubmit}
+        on:socialCopy={handleSocialCopy}
+        on:mediaOpen={handleMediaOpen}
+      />
+    {/each}
+    
+    <ArtifactusePanelToggle />
+  </div>
+  
+  <ArtifactusePanel on:aiRequest={handleAIRequest} />
 </div>
 
-<ArtifactusePanel on:aiRequest={handleAIRequest} />
-<ArtifactusePanelToggle />
+<style>
+  .app-container {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .chat {
+    flex: 1;
+    padding: 20px;
+    min-width: 0;
+    overflow-y: auto;
+  }
+</style>
 ```

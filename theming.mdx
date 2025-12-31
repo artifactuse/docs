@@ -149,6 +149,71 @@ Create your own theme:
 setTheme('brand')
 ```
 
+## Modular CSS Imports
+
+Import all styles at once:
+
+```javascript
+import 'artifactuse/styles'
+```
+
+Or import only what you need for smaller bundle size:
+
+```javascript
+// Base (required)
+import 'artifactuse/styles/base/variables.css'
+import 'artifactuse/styles/base/reset.css'
+
+// Components (pick what you use)
+import 'artifactuse/styles/components/message.css'
+import 'artifactuse/styles/components/panel.css'
+import 'artifactuse/styles/components/card.css'
+import 'artifactuse/styles/components/toggle.css'
+import 'artifactuse/styles/components/viewer.css'
+import 'artifactuse/styles/components/form.css'
+import 'artifactuse/styles/components/social.css'
+
+// Processors (pick what you use)
+import 'artifactuse/styles/processors/image.css'
+import 'artifactuse/styles/processors/video.css'
+import 'artifactuse/styles/processors/audio.css'
+import 'artifactuse/styles/processors/code.css'
+import 'artifactuse/styles/processors/table.css'
+import 'artifactuse/styles/processors/math.css'
+import 'artifactuse/styles/processors/embed.css'
+
+// Utilities
+import 'artifactuse/styles/utilities/animations.css'
+import 'artifactuse/styles/utilities/responsive.css'
+```
+
+<Note>
+  When using modular imports, always import `base/variables.css` and `base/reset.css` first, and `utilities/` files last.
+</Note>
+
+### CSS File Reference
+
+| File | Description |
+|------|-------------|
+| `base/variables.css` | CSS custom properties, theme colors |
+| `base/reset.css` | Base resets and utility classes |
+| `components/message.css` | ArtifactuseAgentMessage styling |
+| `components/panel.css` | ArtifactusePanel styling |
+| `components/card.css` | ArtifactuseCard styling |
+| `components/toggle.css` | ArtifactusePanelToggle styling |
+| `components/viewer.css` | Media lightbox viewer |
+| `components/form.css` | Inline form styling |
+| `components/social.css` | Social preview styling (all platforms) |
+| `processors/image.css` | Image containers, galleries |
+| `processors/video.css` | Video embeds, lazy-loaded facades |
+| `processors/audio.css` | Audio players, Spotify/SoundCloud |
+| `processors/code.css` | Code blocks, syntax highlighting |
+| `processors/table.css` | Enhanced tables with sorting |
+| `processors/math.css` | Math/LaTeX, Mermaid diagrams |
+| `processors/embed.css` | Maps, documents, interactive embeds |
+| `utilities/animations.css` | Keyframes, transitions |
+| `utilities/responsive.css` | Media queries, print styles |
+
 ## Panel Styling
 
 Customize the side panel:
