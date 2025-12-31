@@ -83,8 +83,9 @@
           {
             "group": "Customization",
             "pages": [
-              "theming",
-              "cdn"
+              "customization/theming",
+              "customization/cdn",
+              "customization/panels"
             ]
           }
         ]

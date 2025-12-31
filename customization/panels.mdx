@@ -1,0 +1,384 @@
+---
+title: Custom Panels
+description: Build your own panel artifacts
+icon: "puzzle"
+---
+
+## Overview
+
+Panel artifacts are standalone web apps that run inside iframes and communicate with the Artifactuse SDK via postMessage. You can build custom panels using any framework - React, Vue, Svelte, or vanilla JavaScript.
+
+<Card title="Panels Repository" icon="github" href="https://github.com/artifactuse/panels">
+  View source code, development docs, and contribution guidelines
+</Card>
+
+## Official Panels
+
+| Package | Description | Tier |
+|---------|-------------|------|
+| `@artifactuse/json-panel` | Interactive JSON tree viewer | 🆓 Free |
+| `@artifactuse/svg-panel` | SVG preview with pan/zoom | 🆓 Free |
+| `@artifactuse/diff-panel` | Side-by-side diff comparison | 🆓 Free |
+| `@artifactuse/html-panel` | HTML + Markdown preview | 🆓 Free |
+| `@artifactuse/react-panel` | React/JSX preview | 🆓 Free |
+| `@artifactuse/vue-panel` | Vue SFC preview | 🆓 Free |
+| `@artifactuse/form-panel` | Interactive forms, wizards | 🆓 Free |
+| `@artifactuse/editor-panel` | Canvas + Video editor | ⭐ Pro |
+| `@artifactuse/code-panel` | JS + Python code execution | ⭐ Pro |
+
+## How Panels Work
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Your App                                               │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │  Artifactuse SDK                                  │  │
+│  │                                                   │  │
+│  │  ┌─────────────────┐    postMessage    ┌───────┐  │  │
+│  │  │ ArtifactusePanel│ ◄──────────────► │ Panel │  │  │
+│  │  │                 │                   │ iframe│  │  │
+│  │  └─────────────────┘                   └───────┘  │  │
+│  └───────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+```
+
+1. SDK detects artifact type in AI response
+2. SDK loads appropriate panel URL in iframe
+3. SDK sends artifact data via `postMessage`
+4. Panel renders content and sends events back
+
+## Communication Protocol
+
+Panels communicate with the SDK using the standard `postMessage` API. You can implement this in any language or framework.
+
+### SDK → Panel
+
+```javascript
+// Messages your panel will receive from the SDK
+window.addEventListener('message', (event) => {
+  const { type, action, data } = event.data;
+  
+  if (type !== 'artifactuse') return;
+  
+  switch (action) {
+    case 'setData':
+      // Render artifact content
+      renderContent(data);
+      break;
+    case 'setTheme':
+      // Apply theme ('dark' or 'light')
+      applyTheme(data);
+      break;
+    case 'setAccent':
+      // Apply accent color ('#6366f1' or 'purple')
+      applyAccentColor(data);
+      break;
+  }
+});
+```
+
+### Panel → SDK
+
+```javascript
+// Send messages back to the SDK
+function sendToSDK(action, data) {
+  window.parent.postMessage({
+    type: 'artifactuse',
+    action,
+    data,
+    timestamp: Date.now()
+  }, '*');
+}
+
+// Signal ready when panel loads
+sendToSDK('panel:ready', {});
+
+// Send form submission
+sendToSDK('form:submit', { formId, values });
+
+// Send export complete
+sendToSDK('export:complete', { artifactId, filename });
+```
+
+## Building a Custom Panel
+
+<Steps>
+  <Step title="Create project">
+    Set up a project with your preferred framework (React, Vue, Svelte, vanilla JS)
+  </Step>
+  <Step title="Handle messages">
+    Listen for `setData`, `setTheme`, and `setAccent` messages from the SDK
+  </Step>
+  <Step title="Render content">
+    Display the artifact data passed from the SDK
+  </Step>
+  <Step title="Send events">
+    Emit events back to the SDK when user interacts
+  </Step>
+  <Step title="Deploy">
+    Host on your CDN and configure SDK to use it
+  </Step>
+</Steps>
+
+### Vanilla JavaScript
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Custom Panel</title>
+  <style>
+    body { font-family: system-ui; margin: 0; padding: 20px; }
+    .dark { background: #111827; color: #f3f4f6; }
+    .light { background: #ffffff; color: #111827; }
+  </style>
+</head>
+<body class="dark">
+  <div id="content"></div>
+  
+  <script>
+    let currentTheme = 'dark';
+    
+    window.addEventListener('message', (event) => {
+      const { type, action, data } = event.data || {};
+      if (type !== 'artifactuse') return;
+      
+      if (action === 'setData') {
+        document.getElementById('content').innerHTML = renderData(data);
+      }
+      if (action === 'setTheme') {
+        document.body.className = data;
+        currentTheme = data;
+      }
+    });
+    
+    function renderData(data) {
+      // Your rendering logic
+      return `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+    }
+    
+    // Signal ready
+    window.parent.postMessage({ 
+      type: 'artifactuse', 
+      action: 'panel:ready' 
+    }, '*');
+  </script>
+</body>
+</html>
+```
+
+### Using the Bridge Helper (Optional)
+
+If you prefer, use `@artifactuse/shared` for convenience:
+
+<Tabs>
+  <Tab title="Vue">
+```javascript
+import { createBridge } from '@artifactuse/shared/bridge';
+
+const bridge = createBridge({ debug: true });
+
+bridge.on('setData', (data) => {
+  state.value = data;
+});
+
+bridge.on('setTheme', (theme) => {
+  document.body.className = theme;
+});
+
+bridge.send('form:submit', { formId, values });
+bridge.signalReady();
+```
+  </Tab>
+  <Tab title="React">
+```javascript
+import { useEffect, useState } from 'react';
+import { createBridge } from '@artifactuse/shared/bridge';
+
+function Panel() {
+  const [data, setData] = useState(null);
+  
+  useEffect(() => {
+    const bridge = createBridge({ debug: true });
+    
+    bridge.on('setData', setData);
+    bridge.on('setTheme', (theme) => {
+      document.body.className = theme;
+    });
+    
+    return () => bridge.destroy();
+  }, []);
+  
+  return <div>{/* render data */}</div>;
+}
+```
+  </Tab>
+  <Tab title="Svelte">
+```javascript
+import { onMount } from 'svelte';
+import { createBridge } from '@artifactuse/shared/bridge';
+
+let data = null;
+let bridge;
+
+onMount(() => {
+  bridge = createBridge({ debug: true });
+  
+  bridge.on('setData', (d) => { data = d; });
+  bridge.on('setTheme', (theme) => {
+    document.body.className = theme;
+  });
+  
+  return () => bridge.destroy();
+});
+```
+  </Tab>
+</Tabs>
+
+## Theme Support
+
+Panels should support both dark and light themes. The SDK sends theme updates via `setTheme` message.
+
+```javascript
+// Receive theme from SDK
+window.addEventListener('message', (event) => {
+  if (event.data?.action === 'setTheme') {
+    const theme = event.data.data; // 'dark' or 'light'
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+});
+```
+
+### CSS Variables
+
+Use CSS variables for easy theming:
+
+```css
+:root {
+  --bg: #111827;
+  --text: #f3f4f6;
+  --border: #374151;
+  --primary: #6366f1;
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --text: #111827;
+  --border: #e5e7eb;
+  --primary: #4f46e5;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+```
+
+## Registering Custom Panels
+
+To use a custom panel, you need to:
+
+1. **Host your panel** on a CDN
+2. **Extend the SDK's panel mapping** to recognize your artifact type
+
+### Step 1: Host Your Panel
+
+Deploy your panel to a CDN following this structure:
+
+```
+https://cdn.yourdomain.com/
+├── form-panel/
+├── json-panel/
+├── my-custom-panel/    ← Your custom panel
+└── ...
+```
+
+### Step 2: Configure the SDK
+
+Point the SDK to your CDN:
+
+```javascript
+provideArtifactuse({
+  cdnUrl: 'https://cdn.yourdomain.com',
+})
+```
+
+### Step 3: Register Your Panel Type
+
+The SDK uses a `PANEL_URL_MAP` in `sdk/src/core/index.js` to route artifact types to panel URLs. To add a custom panel, extend this mapping:
+
+```javascript
+// sdk/src/core/index.js
+
+const PANEL_URL_MAP = {
+  // Built-in panels
+  form: 'form-panel',
+  json: 'json-panel',
+  svg: 'svg-panel',
+  // ... other built-in types
+  
+  // Add your custom panel
+  chart: 'chart-panel',
+  diagram: 'diagram-panel',
+  mytype: 'my-custom-panel',
+};
+```
+
+The SDK will then load `{cdnUrl}/{panel-path}/` when it detects an artifact with that type or language.
+
+### How Panel Routing Works
+
+When the SDK detects an artifact, it looks up the panel URL using:
+
+1. **Artifact type** (e.g., `form`, `social`)
+2. **Code language** (e.g., `json`, `svg`, `python`)
+
+```javascript
+// Example: artifact with type "chart" 
+// → loads https://cdn.yourdomain.com/chart-panel/
+
+// Example: code block with language "json"
+// → loads https://cdn.yourdomain.com/json-panel/
+```
+
+### Full Example
+
+```javascript
+// 1. Your custom panel handles "chart" artifacts
+// Hosted at: https://cdn.example.com/chart-panel/
+
+// 2. Extend PANEL_URL_MAP in sdk/src/core/index.js
+const PANEL_URL_MAP = {
+  // ... existing mappings
+  chart: 'chart-panel',
+  'chart-bar': 'chart-panel',
+  'chart-line': 'chart-panel',
+};
+
+// 3. Configure SDK
+provideArtifactuse({
+  cdnUrl: 'https://cdn.example.com',
+});
+
+// 4. AI can now generate chart artifacts
+// ```chart
+// { "type": "bar", "data": [...] }
+// ```
+```
+
+## Resources
+
+<CardGroup cols={2}>
+  <Card title="Source Code" icon="github" href="https://github.com/artifactuse/panels">
+    Browse official panel implementations
+  </Card>
+  <Card title="Development Guide" icon="book" href="https://github.com/artifactuse/panels/blob/main/docs/DEVELOPING.md">
+    Step-by-step guide to building panels
+  </Card>
+  <Card title="Shared Utilities" icon="package" href="https://github.com/artifactuse/panels/tree/main/packages/shared">
+    Bridge, theme, and component utilities
+  </Card>
+  <Card title="Contributing" icon="git-pull-request" href="https://github.com/artifactuse/panels/blob/main/CONTRIBUTING.md">
+    Contribute to official panels
+  </Card>
+</CardGroup>
