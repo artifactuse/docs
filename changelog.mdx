@@ -3,6 +3,51 @@ title: Changelog
 description: Latest updates and releases
 ---
 
+<Update label="v1.1.0" description="Media Lightbox & Modular CSS">
+
+## New Features
+
+- **Media Lightbox** - Images and PDFs now open in a fullscreen viewer with zoom, download, and keyboard controls
+- **Typing Indicator** - New `typing` prop on ArtifactuseAgentMessage for streaming responses
+- **Modular CSS** - Styles split into 19 files for tree-shaking and easier maintenance
+
+## Breaking Changes
+
+- **Form buttons structure** - Buttons now use `data.fields` array with `type: "button"` instead of `data.buttons`
+
+```json
+// Before (no longer supported)
+{
+  "variant": "buttons",
+  "data": {
+    "buttons": [
+      {"id": "yes", "label": "Yes", "style": "primary"}
+    ]
+  }
+}
+
+// After
+{
+  "variant": "buttons",
+  "data": {
+    "fields": [
+      {"type": "button", "id": "yes", "label": "Yes", "style": "primary"}
+    ]
+  }
+}
+```
+
+## New Events
+
+- `media-open` - Fired when image/PDF opens in lightbox viewer
+
+## Documentation
+
+- Added dedicated component pages for ArtifactuseAgentMessage, ArtifactusePanel, ArtifactusePanelToggle
+- Added modular CSS imports guide to Theming page
+
+</Update>
+
 <Update label="v1.0.0" description="Initial Release">
 
 ## Features
