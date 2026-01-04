@@ -276,55 +276,122 @@ body {
 
 ## Registering Custom Panels
 
-To use a custom panel, you need to:
+The SDK supports configurable panels that can be added, overridden, or disabled without modifying SDK source code.
 
-1. **Host your panel** on a CDN
-2. **Extend the SDK's panel mapping** to recognize your artifact type
-
-### Step 1: Host Your Panel
-
-Deploy your panel to a CDN following this structure:
-
-```
-https://cdn.yourdomain.com/
-├── form-panel/
-├── json-panel/
-├── my-custom-panel/    ← Your custom panel
-└── ...
-```
-
-### Step 2: Configure the SDK
-
-Point the SDK to your CDN:
+### Configuration Options
 
 ```javascript
 provideArtifactuse({
+  // Base CDN URL (optional, defaults to Artifactuse CDN)
   cdnUrl: 'https://cdn.yourdomain.com',
+  
+  // Panel configuration
+  panels: {
+    // Add new panel type (uses cdnUrl)
+    'chart': 'chart-panel',
+    
+    // Override with full URL (different CDN)
+    'video': 'https://video-cdn.com/editor-panel',
+    
+    // Explicit CDN per panel
+    'diagram': { path: 'diagram-panel', cdn: 'https://diagrams.example.com' },
+    
+    // Disable a built-in panel
+    'canvas': null,
+  }
 })
 ```
 
-### Step 3: Register Your Panel Type
+### Panel Configuration Formats
 
-The SDK uses a `PANEL_URL_MAP` in `sdk/src/core/index.js` to route artifact types to panel URLs. To add a custom panel, extend this mapping:
+| Format | Example | Description |
+|--------|---------|-------------|
+| Relative path | `'chart-panel'` | Uses `cdnUrl` as base |
+| Full URL | `'https://cdn.example.com/panel'` | Direct URL to panel |
+| Object | `{ path: 'panel', cdn: 'https://...' }` | Explicit path + CDN |
+| Null | `null` | Disable the panel |
 
+### Runtime Registration
+
+Register panels at runtime with support for type aliases:
+
+<Tabs>
+  <Tab title="Vue">
 ```javascript
-// sdk/src/core/index.js
+const { registerPanel, unregisterPanel, hasPanel, panelTypes } = useArtifactuse();
 
-const PANEL_URL_MAP = {
-  // Built-in panels
-  form: 'form-panel',
-  json: 'json-panel',
-  svg: 'svg-panel',
-  // ... other built-in types
-  
-  // Add your custom panel
-  chart: 'chart-panel',
-  diagram: 'diagram-panel',
-  mytype: 'my-custom-panel',
-};
+// Register single type
+registerPanel('chart', 'chart-panel');
+
+// Register multiple types/aliases at once
+registerPanel(['python', 'py'], 'code-panel');
+registerPanel(['typescript', 'ts', 'tsx'], 'code-panel');
+
+// Check if panel exists
+if (hasPanel({ type: 'chart' })) {
+  console.log('Chart panel available');
+}
+
+// Get all registered types
+console.log(panelTypes.value);
+
+// Disable multiple panels
+unregisterPanel(['canvas', 'whiteboard', 'drawing']);
 ```
+  </Tab>
+  <Tab title="React">
+```javascript
+import { usePanelRegistry } from 'artifactuse/react';
 
-The SDK will then load `{cdnUrl}/{panel-path}/` when it detects an artifact with that type or language.
+function PluginLoader() {
+  const { register, unregister, isRegistered, types } = usePanelRegistry();
+  
+  useEffect(() => {
+    // Register with aliases
+    register(['python', 'py'], 'code-panel');
+    
+    return () => unregister(['python', 'py']);
+  }, []);
+  
+  return <div>Panels: {types.join(', ')}</div>;
+}
+```
+  </Tab>
+  <Tab title="Svelte">
+```javascript
+const { registerPanel, unregisterPanel, panelTypes } = getArtifactuseContext();
+
+// Register with aliases
+registerPanel(['python', 'py'], 'code-panel');
+
+// Reactive store of panel types
+$: console.log($panelTypes);
+
+// Disable panels
+unregisterPanel(['canvas', 'whiteboard']);
+```
+  </Tab>
+  <Tab title="Vanilla JS">
+```javascript
+const sdk = createArtifactuse({
+  panels: {
+    'chart': 'chart-panel',
+  }
+});
+
+// Runtime registration
+sdk.registerPanel(['python', 'py'], 'code-panel');
+
+// Check availability
+if (sdk.hasPanel({ language: 'py' })) {
+  const url = sdk.getPanelUrl({ language: 'py' });
+}
+
+// Get all types
+console.log(sdk.getPanelTypes());
+```
+  </Tab>
+</Tabs>
 
 ### How Panel Routing Works
 
@@ -344,27 +411,52 @@ When the SDK detects an artifact, it looks up the panel URL using:
 ### Full Example
 
 ```javascript
-// 1. Your custom panel handles "chart" artifacts
-// Hosted at: https://cdn.example.com/chart-panel/
+import { provideArtifactuse, useArtifactuse } from 'artifactuse/vue';
 
-// 2. Extend PANEL_URL_MAP in sdk/src/core/index.js
-const PANEL_URL_MAP = {
-  // ... existing mappings
-  chart: 'chart-panel',
-  'chart-bar': 'chart-panel',
-  'chart-line': 'chart-panel',
-};
-
-// 3. Configure SDK
+// 1. Configure SDK with custom panels
 provideArtifactuse({
   cdnUrl: 'https://cdn.example.com',
+  panels: {
+    // New panel types
+    'chart': 'chart-panel',
+    'chart-bar': 'chart-panel',
+    'chart-line': 'chart-panel',
+    
+    // Override video to use different CDN
+    'video': 'https://video-cdn.example.com/editor-panel/video',
+    
+    // Disable canvas
+    'canvas': null,
+  }
 });
 
-// 4. AI can now generate chart artifacts
+// 2. Register additional panels at runtime
+const { registerPanel } = useArtifactuse();
+registerPanel(['python', 'py'], 'code-panel');
+
+// 3. AI can now generate chart artifacts
 // ```chart
 // { "type": "bar", "data": [...] }
 // ```
 ```
+
+### Default Panels
+
+The SDK includes these built-in panel mappings:
+
+| Type/Language | Panel Path |
+|--------------|------------|
+| `form` | `form-panel` |
+| `video`, `videoeditor`, `timeline` | `editor-panel/video` |
+| `canvas`, `whiteboard`, `drawing` | `editor-panel/canvas` |
+| `json` | `json-panel` |
+| `svg` | `svg-panel` |
+| `diff`, `patch` | `diff-panel` |
+| `javascript`, `js`, `python`, `py` | `code-panel` |
+| `jsx`, `react` | `react-panel` |
+| `vue` | `vue-panel` |
+| `html`, `htm`, `markdown`, `md` | `html-panel` |
+| `mermaid` | `mermaid-panel` |
 
 ## Resources
 

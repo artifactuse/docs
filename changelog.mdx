@@ -3,7 +3,62 @@ title: Changelog
 description: Latest updates and releases
 ---
 
-<Update label="v1.1.0" description="Media Lightbox & Modular CSS">
+<Update label="v0.2.0" description="Configurable Panels">
+
+## New Features
+
+- **Configurable Panels** - Add, override, or disable panels via configuration without modifying SDK source code
+- **Runtime Panel Registration** - Register and unregister panels at runtime with `registerPanel()` and `unregisterPanel()`
+- **Array Type Support** - Register multiple types/aliases at once: `registerPanel(['python', 'py'], 'code-panel')`
+- **Mixed CDN Support** - Use different CDNs for different panel types
+
+## New Config Options
+
+```javascript
+provideArtifactuse({
+  // Panel configuration
+  panels: {
+    'chart': 'chart-panel',                    // Add new panel (uses cdnUrl)
+    'video': 'https://my-cdn.com/video-panel', // Full URL override
+    'diagram': { path: 'panel', cdn: '...' },  // Explicit CDN
+    'canvas': null,                             // Disable panel
+  }
+})
+```
+
+## New Methods
+
+| Method | Description |
+|--------|-------------|
+| `hasPanel(artifact)` | Check if panel exists for artifact |
+| `registerPanel(types, panel)` | Register panel (accepts string or string[]) |
+| `unregisterPanel(types)` | Disable panel (accepts string or string[]) |
+| `getPanelTypes()` | Get list of registered panel types |
+
+## New Computed/Stores
+
+| Property | Description |
+|----------|-------------|
+| `panelTypes` | Reactive list of registered panel types |
+| `activePanelUrl` | URL for active artifact's panel |
+
+## React Hook
+
+New `usePanelRegistry()` hook for panel management:
+
+```javascript
+const { register, unregister, isRegistered, types } = usePanelRegistry();
+```
+
+## Documentation
+
+- Added [Panels configuration guide](/panels#registering-custom-panels)
+- Updated [CDN page](/cdn) with panel configuration options
+- Updated README with Panels section
+
+</Update>
+
+<Update label="v0.1.1" description="Media Lightbox & Modular CSS">
 
 ## New Features
 
@@ -50,7 +105,7 @@ description: Latest updates and releases
 
 </Update>
 
-<Update label="v1.0.0" description="Initial Release">
+<Update label="v0.1.0" description="Initial Release">
 
 ## Features
 

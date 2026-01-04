@@ -176,6 +176,70 @@ setArtifactuseContext({
 })
 ```
 
+### Custom Panel Mapping
+
+You can add, override, or disable specific panels without changing the base CDN:
+
+```javascript
+provideArtifactuse({
+  // Base CDN for most panels
+  cdnUrl: 'https://cdn.yourdomain.com',
+  
+  // Custom panel configuration
+  panels: {
+    // Add new panel type
+    'chart': 'chart-panel',
+    
+    // Override specific panel with different CDN
+    'video': 'https://video-cdn.example.com/editor-panel/video',
+    
+    // Explicit path + CDN
+    'diagram': { path: 'diagram-panel', cdn: 'https://diagrams.example.com' },
+    
+    // Disable a panel
+    'canvas': null,
+  }
+})
+```
+
+### Mixed CDN Example
+
+Use different CDNs for different panels:
+
+```javascript
+provideArtifactuse({
+  // Default CDN for most panels
+  cdnUrl: 'https://cdn.yourdomain.com',
+  
+  panels: {
+    // Video from specialized CDN
+    'video': 'https://video-cdn.example.com/editor-panel/video',
+    'videoeditor': 'https://video-cdn.example.com/editor-panel/video',
+    
+    // Charts from another CDN
+    'chart': { path: 'chart-panel', cdn: 'https://charts.example.com' },
+    
+    // Code execution from secure CDN
+    'javascript': 'https://sandbox.example.com/code-panel',
+    'python': 'https://sandbox.example.com/code-panel',
+  }
+})
+```
+
+### Runtime Panel Registration
+
+Register or override panels at runtime:
+
+```javascript
+const { registerPanel, unregisterPanel } = useArtifactuse();
+
+// Register with aliases
+registerPanel(['python', 'py'], 'https://sandbox.example.com/code-panel');
+
+// Disable panels
+unregisterPanel(['canvas', 'whiteboard', 'drawing']);
+```
+
 ### Version Pinning
 
 Pin to a specific version for stability:
@@ -211,6 +275,9 @@ Access-Control-Allow-Methods: GET, OPTIONS
 <CardGroup cols={2}>
   <Card title="Panels" icon="github" href="https://github.com/artifactuse/panels">
     Clone the open source repository
+  </Card>
+  <Card title="Custom Panels" icon="puzzle" href="/customization/panels">
+    Learn how to build custom panels
   </Card>
   <Card title="Studio Panels" icon="mail" href="mailto:hello@artifactuse.com">
     Contact us for Enterprise access
