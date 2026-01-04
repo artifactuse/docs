@@ -41,10 +41,12 @@ import { ArtifactuseAgentMessage } from 'artifactuse/svelte'
     :content="message.content"
     :message-id="message.id"
     :typing="isStreaming"
+    :is-last-message="isLastMessage"
     @artifact-detected="onDetected"
     @artifact-open="onOpen"
     @form-submit="onFormSubmit"
     @form-cancel="onFormCancel"
+    @form-button-click="onFormButtonClick"
     @social-copy="onSocialCopy"
     @media-open="onMediaOpen"
   />
@@ -57,10 +59,12 @@ import { ArtifactuseAgentMessage } from 'artifactuse/svelte'
   content={message.content}
   messageId={message.id}
   typing={isStreaming}
+  isLastMessage={isLastMessage}
   onArtifactDetected={onDetected}
   onArtifactOpen={onOpen}
   onFormSubmit={onFormSubmit}
   onFormCancel={onFormCancel}
+  onFormButtonClick={onFormButtonClick}
   onSocialCopy={onSocialCopy}
   onMediaOpen={onMediaOpen}
 />
@@ -72,12 +76,14 @@ import { ArtifactuseAgentMessage } from 'artifactuse/svelte'
   content={message.content}
   messageId={message.id}
   typing={isStreaming}
-  on:artifactDetected={onDetected}
-  on:artifactOpen={onOpen}
-  on:formSubmit={onFormSubmit}
-  on:formCancel={onFormCancel}
-  on:socialCopy={onSocialCopy}
-  on:mediaOpen={onMediaOpen}
+  isLastMessage={isLastMessage}
+  on:artifact-detected={onDetected}
+  on:artifact-open={onOpen}
+  on:form-submit={onFormSubmit}
+  on:form-cancel={onFormCancel}
+  on:form-button-click={onFormButtonClick}
+  on:social-copy={onSocialCopy}
+  on:media-open={onMediaOpen}
 />
 ```
   </Tab>
@@ -91,6 +97,7 @@ import { ArtifactuseAgentMessage } from 'artifactuse/svelte'
 | `messageId` | `string` | Required | Unique identifier for the message |
 | `typing` | `boolean` | `false` | Show typing indicator (use while streaming) |
 | `inlineCards` | `boolean` | `true` | Show clickable cards for panel artifacts inline |
+| `isLastMessage` | `boolean` | `false` | Whether this is the last message in the conversation. Keeps forms active after page reload. |
 
 ## Events
 
@@ -98,13 +105,14 @@ import { ArtifactuseAgentMessage } from 'artifactuse/svelte'
 |-------|---------|-------------|
 | `artifact-detected` | `Artifact[]` | Fired when artifacts are detected in content |
 | `artifact-open` | `Artifact` | Fired when user clicks an artifact card to open panel |
-| `form-submit` | `{ formId, values }` | Fired when an inline form is submitted |
-| `form-cancel` | `{ formId }` | Fired when an inline form is cancelled |
+| `form-submit` | `{ formId, action, values, timestamp }` | Fired when an inline form is submitted |
+| `form-cancel` | `{ formId, action, buttonName, timestamp }` | Fired when an inline form is cancelled |
+| `form-button-click` | `{ formId, action, buttonName, buttonLabel, values, timestamp }` | Fired when a custom button is clicked |
 | `social-copy` | `{ platform, text }` | Fired when social preview text is copied |
 | `media-open` | `{ type, src, alt, caption }` | Fired when image/PDF is opened in lightbox viewer |
 
 <Note>
-  Event names use kebab-case in Vue (`@form-submit`) and camelCase in React (`onFormSubmit`). Svelte uses camelCase with `on:` prefix (`on:formSubmit`).
+  Event names use kebab-case in Vue (`@form-submit`) and camelCase in React (`onFormSubmit`). Svelte uses kebab-case with `on:` prefix (`on:form-submit`).
 </Note>
 
 ## Artifact Rendering
@@ -120,6 +128,43 @@ The component automatically renders different artifact types:
 | Images | Inline with lightbox on click |
 | Videos | Inline embed (YouTube, Vimeo, etc.) |
 | Other embeds | Inline (maps, documents, etc.) |
+
+## Form Collapse Behavior
+
+Inline forms automatically collapse after user interaction to prevent duplicate submissions and keep the chat clean.
+
+### Form States
+
+| State | Description | Visual |
+|-------|-------------|--------|
+| `active` | Interactive, user can fill and submit | Full form with fields |
+| `submitted` | User clicked submit or action button | Collapsed with ✓ checkmark |
+| `cancelled` | User clicked cancel | Collapsed with ✗ icon |
+| `inactive` | Historical form (page refresh) | Collapsed with — dash |
+
+### Behavior Rules
+
+- **Current session**: Forms stay active until user interacts
+- **After submit/cancel/custom action**: Form collapses immediately
+- **After page refresh**: 
+  - Last message forms stay active (via `isLastMessage` prop)
+  - Older message forms collapse as inactive
+- **Reset action**: Form stays active (doesn't collapse)
+
+### Example with isLastMessage
+
+```vue
+<template>
+  <ArtifactuseAgentMessage 
+    v-for="(msg, index) in messages"
+    :key="msg.id"
+    :content="msg.content"
+    :message-id="msg.id"
+    :is-last-message="index === messages.length - 1"
+    @form-submit="handleFormSubmit"
+  />
+</template>
+```
 
 ## Media Lightbox
 
@@ -160,12 +205,15 @@ The typing indicator displays animated loading bars that disappear when `typing`
 <template>
   <div class="chat">
     <ArtifactuseAgentMessage 
-      v-for="msg in messages"
+      v-for="(msg, index) in messages"
       :key="msg.id"
       :content="msg.content"
       :message-id="msg.id"
       :typing="msg.isStreaming"
+      :is-last-message="index === messages.length - 1"
       @form-submit="handleFormSubmit"
+      @form-cancel="handleFormCancel"
+      @form-button-click="handleFormButtonClick"
       @social-copy="handleSocialCopy"
       @media-open="handleMediaOpen"
     />
@@ -181,6 +229,16 @@ const messages = ref([])
 function handleFormSubmit({ formId, values }) {
   // Send form data back to AI
   sendToAI(`User submitted form: ${JSON.stringify(values)}`)
+}
+
+function handleFormCancel({ formId }) {
+  // User cancelled the form
+  console.log('Form cancelled:', formId)
+}
+
+function handleFormButtonClick({ formId, action, buttonName, values }) {
+  // Handle custom button actions
+  console.log('Button clicked:', buttonName, action)
 }
 
 function handleSocialCopy({ platform, text }) {
@@ -208,6 +266,16 @@ function Chat() {
     sendToAI(`User submitted form: ${JSON.stringify(values)}`)
   }
 
+  const handleFormCancel = ({ formId }) => {
+    // User cancelled the form
+    console.log('Form cancelled:', formId)
+  }
+
+  const handleFormButtonClick = ({ formId, action, buttonName, values }) => {
+    // Handle custom button actions
+    console.log('Button clicked:', buttonName, action)
+  }
+
   const handleSocialCopy = ({ platform, text }) => {
     // Track analytics
     analytics.track('social_copy', { platform })
@@ -220,13 +288,16 @@ function Chat() {
 
   return (
     <div className="chat">
-      {messages.map(msg => (
+      {messages.map((msg, index) => (
         <ArtifactuseAgentMessage 
           key={msg.id}
           content={msg.content}
           messageId={msg.id}
           typing={msg.isStreaming}
+          isLastMessage={index === messages.length - 1}
           onFormSubmit={handleFormSubmit}
+          onFormCancel={handleFormCancel}
+          onFormButtonClick={handleFormButtonClick}
           onSocialCopy={handleSocialCopy}
           onMediaOpen={handleMediaOpen}
         />

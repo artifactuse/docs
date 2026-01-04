@@ -85,9 +85,9 @@ Quick action buttons:
   "display": "inline",
   "description": "How would you like to proceed?",
   "data": {
-    "buttons": [
-      {"id": "continue", "label": "Continue", "style": "primary"},
-      {"id": "cancel", "label": "Cancel", "style": "secondary"}
+    "fields": [
+      {"label": "Continue", "action": "continue", "variant": "primary"},
+      {"label": "Cancel", "action": "cancel", "variant": "ghost"}
     ]
   }
 }
@@ -154,14 +154,198 @@ Quick action buttons:
 }
 ```
 
+## Button Actions
+
+Buttons in forms can have different actions:
+
+| Action | Description | Form Behavior |
+|--------|-------------|---------------|
+| `submit` | Submit the form | Collapses with ✓ |
+| `cancel` | Cancel the form | Collapses with ✗ |
+| `reset` | Reset to default values | Stays active |
+| Custom string | Custom action (e.g., `"continue"`, `"skip"`) | Collapses with ✓ |
+
+```json
+{
+  "type": "buttons",
+  "fields": [
+    {"label": "Submit", "action": "submit", "variant": "primary"},
+    {"label": "Reset", "action": "reset", "variant": "secondary"},
+    {"label": "Cancel", "action": "cancel", "variant": "ghost"}
+  ]
+}
+```
+
+## Form Collapse Behavior
+
+Inline forms automatically collapse after user interaction to keep the chat clean and prevent duplicate submissions.
+
+### States
+
+| State | Icon | Description |
+|-------|------|-------------|
+| `active` | — | Form is interactive |
+| `submitted` | ✓ | User submitted or clicked action button |
+| `cancelled` | ✗ | User clicked cancel |
+| `inactive` | — | Historical form after page refresh |
+
+### Visual Appearance
+
+When collapsed, forms display a compact bar showing:
+- Status icon (checkmark, X, or dash)
+- Form title
+
+```
+┌─────────────────────────────────┐
+│  ✓  Contact Form                │
+└─────────────────────────────────┘
+```
+
+### Page Refresh Behavior
+
+After a page refresh:
+- **Last message**: Forms stay active (user can still interact)
+- **Older messages**: Forms collapse as "inactive"
+
+This requires passing the `isLastMessage` prop to `ArtifactuseAgentMessage`:
+
+```vue
+<ArtifactuseAgentMessage 
+  v-for="(msg, index) in messages"
+  :key="msg.id"
+  :content="msg.content"
+  :is-last-message="index === messages.length - 1"
+/>
+```
+
 ## Handling Submissions
 
+<Tabs>
+  <Tab title="Vue">
+```vue
+<ArtifactuseAgentMessage
+  :content="content"
+  @form-submit="handleSubmit"
+  @form-cancel="handleCancel"
+  @form-button-click="handleButtonClick"
+/>
+
+<script setup>
+function handleSubmit({ formId, action, values, timestamp }) {
+  console.log('Form submitted:', formId, values)
+  // Send values to AI or API
+}
+
+function handleCancel({ formId, buttonName, timestamp }) {
+  console.log('Form cancelled:', formId)
+}
+
+function handleButtonClick({ formId, action, buttonName, buttonLabel, values, timestamp }) {
+  console.log('Custom button clicked:', action, buttonName)
+  // Handle custom actions like "continue", "skip", etc.
+}
+</script>
+```
+  </Tab>
+  <Tab title="React">
 ```jsx
 <ArtifactuseAgentMessage
   content={content}
-  onFormSubmit={(data) => {
-    console.log('Form submitted:', data)
-    // Send to AI or API
+  onFormSubmit={({ formId, action, values, timestamp }) => {
+    console.log('Form submitted:', formId, values)
+    // Send values to AI or API
+  }}
+  onFormCancel={({ formId, buttonName, timestamp }) => {
+    console.log('Form cancelled:', formId)
+  }}
+  onFormButtonClick={({ formId, action, buttonName, buttonLabel, values, timestamp }) => {
+    console.log('Custom button clicked:', action, buttonName)
+    // Handle custom actions
   }}
 />
+```
+  </Tab>
+  <Tab title="Svelte">
+```svelte
+<ArtifactuseAgentMessage
+  content={content}
+  on:form-submit={({ detail }) => {
+    console.log('Form submitted:', detail.formId, detail.values)
+  }}
+  on:form-cancel={({ detail }) => {
+    console.log('Form cancelled:', detail.formId)
+  }}
+  on:form-button-click={({ detail }) => {
+    console.log('Custom button clicked:', detail.action, detail.buttonName)
+  }}
+/>
+```
+  </Tab>
+</Tabs>
+
+## Event Payloads
+
+### form-submit
+
+```typescript
+{
+  formId: string      // Unique form identifier
+  action: 'submit'    // Always 'submit'
+  values: object      // Form field values { fieldName: value }
+  timestamp: number   // Unix timestamp
+}
+```
+
+### form-cancel
+
+```typescript
+{
+  formId: string        // Unique form identifier
+  action: 'cancel'      // Always 'cancel'
+  buttonName: string    // Button name or 'cancel'
+  timestamp: number     // Unix timestamp
+}
+```
+
+### form-button-click
+
+```typescript
+{
+  formId: string        // Unique form identifier
+  action: string        // Custom action string (e.g., 'continue', 'skip')
+  buttonName: string    // Button name or label
+  buttonLabel: string   // Button display label
+  values: object        // Current form field values
+  timestamp: number     // Unix timestamp
+}
+```
+
+## Styling Collapsed Forms
+
+Collapsed forms use these CSS classes:
+
+```css
+/* Base collapsed container */
+.artifactuse-form--submitted { }
+.artifactuse-form--cancelled { }
+.artifactuse-form--inactive { }
+
+/* Collapsed inner elements */
+.artifactuse-form-collapsed { }
+.artifactuse-form-collapsed-icon { }
+.artifactuse-form-collapsed-title { }
+```
+
+Customize the appearance:
+
+```css
+/* Custom success color for submitted forms */
+.artifactuse-form--submitted {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.artifactuse-form--submitted .artifactuse-form-collapsed-icon {
+  color: rgb(34, 197, 94);
+}
 ```
