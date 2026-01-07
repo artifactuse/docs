@@ -39,30 +39,72 @@ Panels are open source and free to self-host.
   </Step>
   
   <Step title="Deploy to your CDN">
-    **Option A: Using deploy script (AWS S3)**
+    **Option A: Cloudflare Workers (Recommended)**
+    
+    Deploy to Cloudflare's edge network for low-latency global delivery.
+    
+    ```bash
+    # Install Wrangler CLI
+    npm install -g wrangler
+    
+    # Login to Cloudflare
+    wrangler login
+    
+    # Deploy
+    npm run deploy:cf
+    ```
+    
+    That's it! Your panels are now live on Cloudflare's edge network.
+    
+    <Accordion title="Custom Domain">
+      1. Add your domain to Cloudflare
+      2. Update `worker/wrangler.toml`:
+      
+      ```toml
+      [env.production]
+      routes = [
+        { pattern = "panels.yourdomain.com/*", zone_name = "yourdomain.com" }
+      ]
+      ```
+      
+      3. Deploy: `npm run deploy:cf`
+    </Accordion>
+    
+    <Accordion title="Deployment Commands">
+      ```bash
+      npm run deploy:cf              # Deploy to production
+      npm run deploy:cf:staging      # Deploy to staging
+      npm run cf:dev                 # Local development server
+      ```
+    </Accordion>
+    
+    ---
+    
+    **Option B: AWS S3 + CloudFront**
     
     ```bash
     export CDN_BUCKET=your-s3-bucket
     export CDN_URL=https://cdn.yourdomain.com
     export CLOUDFRONT_DISTRIBUTION_ID=XXXXX  # Optional
     
-    npm run deploy
+    npm run deploy:aws
     ```
     
-    **Option B: Manual deployment**
+    <Accordion title="Manual S3 Deployment">
+      Copy each panel's `dist/` folder to your CDN:
+      
+      ```bash
+      aws s3 sync packages/json-panel/dist s3://your-bucket/json-panel
+      aws s3 sync packages/svg-panel/dist s3://your-bucket/svg-panel
+      aws s3 sync packages/diff-panel/dist s3://your-bucket/diff-panel
+      aws s3 sync packages/html-panel/dist s3://your-bucket/html-panel
+      aws s3 sync packages/react-panel/dist s3://your-bucket/react-panel
+      aws s3 sync packages/vue-panel/dist s3://your-bucket/vue-panel
+      aws s3 sync packages/form-panel/dist s3://your-bucket/form-panel
+      ```
+    </Accordion>
     
-    Copy each panel's `dist/` folder to your CDN:
-    
-    ```bash
-    # Example using AWS CLI
-    aws s3 sync packages/json-panel/dist s3://your-bucket/json-panel
-    aws s3 sync packages/svg-panel/dist s3://your-bucket/svg-panel
-    aws s3 sync packages/diff-panel/dist s3://your-bucket/diff-panel
-    aws s3 sync packages/html-panel/dist s3://your-bucket/html-panel
-    aws s3 sync packages/react-panel/dist s3://your-bucket/react-panel
-    aws s3 sync packages/vue-panel/dist s3://your-bucket/vue-panel
-    aws s3 sync packages/form-panel/dist s3://your-bucket/form-panel
-    ```
+    ---
     
     Your CDN structure should look like:
     
@@ -89,9 +131,9 @@ Panels are open source and free to self-host.
   </Step>
 </Steps>
 
-## Studio Panels (Enterprise)
+## Studio Panels (Pro)
 
-Studio panels (Canvas Editor, Video Editor, Code Runtime) are available for Enterprise customers.
+Studio panels (Canvas Editor, Video Editor, Code Runtime) are available for Pro customers.
 
 **Included:**
 - Canvas Editor
@@ -101,12 +143,8 @@ Studio panels (Canvas Editor, Video Editor, Code Runtime) are available for Ente
 ### Setup
 
 <Steps>
-  <Step title="Contact us">
-    Email [hello@artifactuse.com](mailto:hello@artifactuse.com) to get access.
-  </Step>
-  
-  <Step title="Get repository access">
-    We'll add you to the private `@artifactuse/studio` repository.
+  <Step title="Get access">
+    [Subscribe to Pro](https://artifactuse.com/pricing) to get repository access.
   </Step>
   
   <Step title="Clone, build, deploy">
@@ -119,20 +157,20 @@ Studio panels (Canvas Editor, Video Editor, Code Runtime) are available for Ente
     npm run build
     ```
     
-    **Option A: Using deploy script (AWS S3)**
+    **Option A: Cloudflare Workers (Recommended)**
+    
+    ```bash
+    wrangler login
+    npm run deploy:cf
+    ```
+    
+    **Option B: AWS S3**
     
     ```bash
     export CDN_BUCKET=your-s3-bucket
     export CDN_URL=https://cdn.yourdomain.com
     
-    npm run deploy
-    ```
-    
-    **Option B: Manual deployment**
-    
-    ```bash
-    aws s3 sync packages/editor-panel/dist s3://your-bucket/editor-panel
-    aws s3 sync packages/code-panel/dist s3://your-bucket/code-panel
+    npm run deploy:aws
     ```
     
     Your CDN structure should include:
@@ -259,16 +297,20 @@ Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, OPTIONS
 ```
 
+<Note>
+Cloudflare Workers automatically handles CORS headers. No additional configuration needed.
+</Note>
+
 ## Comparison
 
-| | Artifactuse CDN | Your CDN |
-|--|-----------------|----------|
-| Setup | None | 10-15 min |
-| Maintenance | We handle it | You manage |
-| Updates | Automatic | Manual |
-| Latency | Global edge | Your infrastructure |
-| Control | Limited | Full |
-| Offline | No | Yes |
+| | Artifactuse CDN | Cloudflare Workers | AWS S3 + CloudFront |
+|--|-----------------|-------------------|---------------------|
+| Setup | None | 5 min | 15-30 min |
+| Maintenance | We handle it | Minimal | You manage |
+| Updates | Automatic | Manual | Manual |
+| Latency | Global edge | Global edge | Your regions |
+| Control | Limited | Full | Full |
+| Cost | Included | Free tier available | Pay per usage |
 
 ## Next Steps
 
@@ -279,7 +321,7 @@ Access-Control-Allow-Methods: GET, OPTIONS
   <Card title="Custom Panels" icon="puzzle" href="/customization/panels">
     Learn how to build custom panels
   </Card>
-  <Card title="Studio Panels" icon="mail" href="mailto:hello@artifactuse.com">
-    Contact us for Enterprise access
+  <Card title="Pro Panels" icon="sparkles" href="https://artifactuse.com/pricing">
+    Get access to Studio panels
   </Card>
 </CardGroup>

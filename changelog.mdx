@@ -3,6 +3,43 @@ title: Changelog
 description: Latest updates and releases
 ---
 
+<Update label="v0.2.1" description="Cloudflare Workers Deployment">
+
+## New Features
+
+- **Cloudflare Workers Deployment** - Deploy panels to Cloudflare's edge network with a single command
+- **Simplified Self-Hosting** - New `npm run deploy:cf` command for instant global deployment
+- **Automatic CORS** - Cloudflare Worker handles CORS headers automatically
+
+## New Deployment Commands
+
+```bash
+npm run deploy:cf              # Deploy to production
+npm run deploy:cf:staging      # Deploy to staging
+npm run cf:dev                 # Local development server
+```
+
+## Quick Start
+
+```bash
+# Clone panels repo
+git clone https://github.com/artifactuse/panels.git
+cd panels
+
+# Install and deploy
+npm install
+wrangler login
+npm run deploy:cf
+```
+
+## Documentation
+
+- Updated [CDN page](/cdn) with Cloudflare Workers as recommended option
+- Added deployment comparison table (Artifactuse CDN vs Cloudflare vs AWS)
+- Added custom domain configuration guide
+
+</Update>
+
 <Update label="v0.2.0" description="Configurable Panels">
 
 ## New Features
