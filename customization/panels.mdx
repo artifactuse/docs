@@ -44,37 +44,67 @@ Panel artifacts are standalone web apps that run inside iframes and communicate 
 
 1. SDK detects artifact type in AI response
 2. SDK loads appropriate panel URL in iframe
-3. SDK sends artifact data via `postMessage`
-4. Panel renders content and sends events back
+3. Panel signals ready via `panel:ready` message
+4. SDK sends artifact data via `load:artifact` message
+5. Panel renders content and sends events back
 
 ## Communication Protocol
 
-Panels communicate with the SDK using the standard `postMessage` API. You can implement this in any language or framework.
+Panels communicate with the SDK using the standard `postMessage` API. All messages use the `artifactuse` type for identification.
 
-### SDK → Panel
+### SDK → Panel: Loading Artifacts
+
+When the SDK opens a panel, it sends a `load:artifact` message containing the full artifact data:
 
 ```javascript
-// Messages your panel will receive from the SDK
-window.addEventListener('message', (event) => {
-  const { type, action, data } = event.data;
-  
-  if (type !== 'artifactuse') return;
-  
-  switch (action) {
-    case 'setData':
-      // Render artifact content
-      renderContent(data);
-      break;
-    case 'setTheme':
-      // Apply theme ('dark' or 'light')
-      applyTheme(data);
-      break;
-    case 'setAccent':
-      // Apply accent color ('#6366f1' or 'purple')
-      applyAccentColor(data);
-      break;
+// Message structure sent by SDK
+{
+  type: 'artifactuse',
+  action: 'load:artifact',
+  data: {
+    id: 'artifact-123',
+    messageId: 'msg-456',
+    type: 'code',                    // 'code' or 'form'
+    language: 'json',                // Panel-specific identifier
+    title: 'My Data',
+    code: '{"key": "value"}',        // The artifact content
+    isInline: false,
+    isPreviewable: true,
+    isPanelArtifact: true,
+    createdAt: '2026-01-19T10:24:25.650Z'
   }
-});
+}
+```
+
+### Artifact Code Formats
+
+The `code` field contains different formats depending on the panel type:
+
+| Panel | Language Values | Code Format | Needs JSON Parse |
+|-------|-----------------|-------------|------------------|
+| `json-panel` | `json` | JSON string to display | ✅ Yes |
+| `form-panel` | `form` | JSON form configuration | ✅ Yes |
+| `diff-panel` | `diff` | JSON: `{oldCode, newCode, language}` | ✅ Yes |
+| `editor-panel` | `canvas`, `video` | JSON: `{width, height, shapes}` | ✅ Yes |
+| `svg-panel` | `svg` | Raw SVG markup | ❌ No |
+| `html-panel` | `html`, `markdown`, `md` | Raw HTML/Markdown | ❌ No |
+| `react-panel` | `react`, `jsx` | Raw JSX code | ❌ No |
+| `vue-panel` | `vue` | Raw Vue SFC code | ❌ No |
+| `code-panel` | `javascript`, `js`, `python`, `py` | Raw code | ❌ No |
+
+### SDK → Panel: Theme Updates
+
+The SDK sends theme updates when the user changes themes:
+
+```javascript
+{
+  type: 'artifactuse',
+  action: 'theme:change',
+  data: {
+    theme: 'dark',        // 'dark' or 'light'
+    colors: { ... }       // Optional custom colors
+  }
+}
 ```
 
 ### Panel → SDK
@@ -90,14 +120,20 @@ function sendToSDK(action, data) {
   }, '*');
 }
 
-// Signal ready when panel loads
-sendToSDK('panel:ready', {});
+// Signal ready when panel loads (required!)
+sendToSDK('panel:ready', { timestamp: Date.now() });
 
 // Send form submission
-sendToSDK('form:submit', { formId, values });
+sendToSDK('form:submit', { formId, action: 'submit', values, timestamp: Date.now() });
 
-// Send export complete
-sendToSDK('export:complete', { artifactId, filename });
+// Send form cancellation
+sendToSDK('form:cancel', { formId, action: 'cancel', timestamp: Date.now() });
+
+// Update artifact data
+sendToSDK('artifact:update', { id, data });
+
+// Notify export complete
+sendToSDK('export:complete', { filename, size, type });
 ```
 
 ## Building a Custom Panel
@@ -106,11 +142,14 @@ sendToSDK('export:complete', { artifactId, filename });
   <Step title="Create project">
     Set up a project with your preferred framework (React, Vue, Svelte, vanilla JS)
   </Step>
-  <Step title="Handle messages">
-    Listen for `setData`, `setTheme`, and `setAccent` messages from the SDK
+  <Step title="Signal ready">
+    Send `panel:ready` message when your panel loads
   </Step>
-  <Step title="Render content">
-    Display the artifact data passed from the SDK
+  <Step title="Handle load:artifact">
+    Listen for `load:artifact` message and render the artifact content
+  </Step>
+  <Step title="Handle theme changes">
+    Listen for `theme:change` message and update your UI
   </Step>
   <Step title="Send events">
     Emit events back to the SDK when user interacts
@@ -134,117 +173,290 @@ sendToSDK('export:complete', { artifactId, filename });
   </style>
 </head>
 <body class="dark">
-  <div id="content"></div>
+  <div id="content">Loading...</div>
   
   <script>
     let currentTheme = 'dark';
+    let parentOrigin = null;
     
+    // Send message to SDK
+    function sendToSDK(action, data = {}) {
+      window.parent.postMessage({
+        type: 'artifactuse',
+        action,
+        data,
+        timestamp: Date.now()
+      }, parentOrigin || '*');
+    }
+    
+    // Handle incoming messages
     window.addEventListener('message', (event) => {
       const { type, action, data } = event.data || {};
       if (type !== 'artifactuse') return;
       
-      if (action === 'setData') {
-        document.getElementById('content').innerHTML = renderData(data);
-      }
-      if (action === 'setTheme') {
-        document.body.className = data;
-        currentTheme = data;
+      // Store parent origin for responses
+      if (!parentOrigin) parentOrigin = event.origin;
+      
+      switch (action) {
+        case 'load:artifact':
+          handleArtifact(data);
+          break;
+        case 'theme:change':
+          document.body.className = data.theme || 'dark';
+          currentTheme = data.theme;
+          break;
       }
     });
     
-    function renderData(data) {
-      // Your rendering logic
-      return `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+    // Handle artifact loading
+    function handleArtifact(artifact) {
+      console.log('Loading artifact:', artifact);
+      
+      // Check language
+      if (artifact.language !== 'my-language') {
+        console.warn('Unsupported language:', artifact.language);
+        return;
+      }
+      
+      // For JSON-based panels, parse the code
+      // For raw code panels, use artifact.code directly
+      try {
+        const data = JSON.parse(artifact.code);
+        renderContent(data);
+      } catch (e) {
+        document.getElementById('content').innerHTML = 
+          `<div class="error">Failed to parse: ${e.message}</div>`;
+      }
     }
     
-    // Signal ready
-    window.parent.postMessage({ 
-      type: 'artifactuse', 
-      action: 'panel:ready' 
-    }, '*');
+    function renderContent(data) {
+      document.getElementById('content').innerHTML = 
+        `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+    }
+    
+    // Signal ready when panel loads
+    sendToSDK('panel:ready', { timestamp: Date.now() });
   </script>
 </body>
 </html>
 ```
 
-### Using the Bridge Helper (Optional)
+### Using the Bridge Helper
 
-If you prefer, use `@artifactuse/shared` for convenience:
+For convenience, use `@artifactuse/shared` which handles the message protocol:
 
 <Tabs>
   <Tab title="Vue">
-```javascript
+```vue
+<script setup>
+import { ref, onMounted } from 'vue';
 import { createBridge } from '@artifactuse/shared/bridge';
 
-const bridge = createBridge({ debug: true });
+const data = ref(null);
+const theme = ref('dark');
+let bridge = null;
 
-bridge.on('setData', (data) => {
-  state.value = data;
+onMounted(() => {
+  bridge = createBridge({ debug: true });
+  
+  // Handle artifact loading (primary method)
+  bridge.on('load:artifact', (artifact) => {
+    console.log('Loading artifact:', artifact);
+    
+    if (artifact.language !== 'my-language') {
+      console.warn('Unsupported language:', artifact.language);
+      return;
+    }
+    
+    // For JSON-based artifacts: sanitize and parse
+    try {
+      let code = artifact.code;
+      // Fix unescaped newlines in JSON strings
+      code = code.replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, (match) => {
+        return match.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+      });
+      data.value = JSON.parse(code);
+    } catch (e) {
+      console.error('Failed to parse:', e);
+    }
+    
+    // For raw code artifacts, use directly:
+    // data.value = artifact.code;
+  });
+  
+  // Handle theme changes
+  bridge.on('theme:change', ({ theme: newTheme }) => {
+    theme.value = newTheme;
+  });
+  
+  // Signal ready
+  bridge.signalReady();
 });
 
-bridge.on('setTheme', (theme) => {
-  document.body.className = theme;
-});
-
-bridge.send('form:submit', { formId, values });
-bridge.signalReady();
+// Send events to SDK
+function submitForm(values) {
+  bridge.send('form:submit', { 
+    formId: 'my-form', 
+    action: 'submit',
+    values, 
+    timestamp: Date.now() 
+  });
+}
+</script>
 ```
   </Tab>
   <Tab title="React">
-```javascript
+```jsx
 import { useEffect, useState } from 'react';
 import { createBridge } from '@artifactuse/shared/bridge';
 
 function Panel() {
   const [data, setData] = useState(null);
+  const [theme, setTheme] = useState('dark');
+  const [bridge, setBridge] = useState(null);
   
   useEffect(() => {
-    const bridge = createBridge({ debug: true });
+    const b = createBridge({ debug: true });
+    setBridge(b);
     
-    bridge.on('setData', setData);
-    bridge.on('setTheme', (theme) => {
-      document.body.className = theme;
+    // Handle artifact loading (primary method)
+    b.on('load:artifact', (artifact) => {
+      console.log('Loading artifact:', artifact);
+      
+      if (artifact.language !== 'my-language') {
+        console.warn('Unsupported language:', artifact.language);
+        return;
+      }
+      
+      // For JSON-based artifacts: sanitize and parse
+      try {
+        let code = artifact.code;
+        code = code.replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, (match) => {
+          return match.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+        });
+        setData(JSON.parse(code));
+      } catch (e) {
+        console.error('Failed to parse:', e);
+      }
     });
     
-    return () => bridge.destroy();
+    // Handle theme changes
+    b.on('theme:change', ({ theme }) => setTheme(theme));
+    
+    // Signal ready
+    b.signalReady();
+    
+    return () => b.destroy();
   }, []);
   
-  return <div>{/* render data */}</div>;
+  return (
+    <div className={theme}>
+      {data ? <pre>{JSON.stringify(data, null, 2)}</pre> : 'Loading...'}
+    </div>
+  );
 }
 ```
   </Tab>
   <Tab title="Svelte">
-```javascript
-import { onMount } from 'svelte';
+```svelte
+<script>
+import { onMount, onDestroy } from 'svelte';
 import { createBridge } from '@artifactuse/shared/bridge';
 
 let data = null;
+let theme = 'dark';
 let bridge;
 
 onMount(() => {
   bridge = createBridge({ debug: true });
   
-  bridge.on('setData', (d) => { data = d; });
-  bridge.on('setTheme', (theme) => {
-    document.body.className = theme;
+  // Handle artifact loading (primary method)
+  bridge.on('load:artifact', (artifact) => {
+    console.log('Loading artifact:', artifact);
+    
+    if (artifact.language !== 'my-language') {
+      console.warn('Unsupported language:', artifact.language);
+      return;
+    }
+    
+    // For JSON-based artifacts: sanitize and parse
+    try {
+      let code = artifact.code;
+      code = code.replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, (match) => {
+        return match.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+      });
+      data = JSON.parse(code);
+    } catch (e) {
+      console.error('Failed to parse:', e);
+    }
   });
   
-  return () => bridge.destroy();
+  // Handle theme changes
+  bridge.on('theme:change', ({ theme: t }) => { theme = t; });
+  
+  // Signal ready
+  bridge.signalReady();
 });
+
+onDestroy(() => bridge?.destroy());
+</script>
+
+<div class={theme}>
+  {#if data}
+    <pre>{JSON.stringify(data, null, 2)}</pre>
+  {:else}
+    Loading...
+  {/if}
+</div>
 ```
   </Tab>
 </Tabs>
 
-## Theme Support
+## JSON Sanitization
 
-Panels should support both dark and light themes. The SDK sends theme updates via `setTheme` message.
+When parsing `artifact.code` that contains JSON, you may encounter unescaped newlines inside string values. This happens when the code extractor doesn't properly escape literal newlines.
+
+**Always sanitize before parsing:**
 
 ```javascript
-// Receive theme from SDK
-window.addEventListener('message', (event) => {
-  if (event.data?.action === 'setTheme') {
-    const theme = event.data.data; // 'dark' or 'light'
-    document.documentElement.setAttribute('data-theme', theme);
+function parseArtifactCode(code) {
+  // Fix unescaped newlines inside JSON string values
+  const sanitized = code.replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, (match) => {
+    return match.replace(/\n/g, '\\n')
+                .replace(/\r/g, '\\r')
+                .replace(/\t/g, '\\t');
+  });
+  
+  return JSON.parse(sanitized);
+}
+```
+
+**Panels that need sanitization** (parse JSON):
+- `json-panel` - displays JSON data
+- `form-panel` - parses form configuration
+- `diff-panel` - parses `{oldCode, newCode}` structure
+- `editor-panel` - parses canvas/video data
+
+**Panels that don't need sanitization** (raw code):
+- `svg-panel` - raw SVG markup
+- `html-panel` - raw HTML/Markdown
+- `react-panel` - raw JSX code
+- `vue-panel` - raw Vue SFC code
+- `code-panel` - raw JavaScript/Python
+
+## Theme Support
+
+Panels should support both dark and light themes. The SDK sends theme updates via `theme:change` message.
+
+```javascript
+bridge.on('theme:change', ({ theme, colors }) => {
+  document.documentElement.setAttribute('data-theme', theme);
+  
+  // Apply custom colors if provided
+  if (colors) {
+    Object.entries(colors).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(`--color-${key}`, value);
+    });
   }
 });
 ```
@@ -457,6 +669,87 @@ The SDK includes these built-in panel mappings:
 | `vue` | `vue-panel` |
 | `html`, `htm`, `markdown`, `md` | `html-panel` |
 | `mermaid` | `mermaid-panel` |
+
+## Complete Panel Template
+
+Here's a complete template for building a custom panel:
+
+```javascript
+// my-panel/src/main.js
+import { createBridge } from '@artifactuse/shared/bridge';
+
+let bridge = null;
+let currentData = null;
+
+// Initialize panel
+function init() {
+  bridge = createBridge({ debug: true });
+  
+  // Primary: Handle artifact loading
+  bridge.on('load:artifact', (artifact) => {
+    console.log('Loading artifact:', artifact);
+    
+    // Validate language
+    if (artifact.language !== 'my-language') {
+      console.warn('Unsupported language:', artifact.language);
+      return;
+    }
+    
+    try {
+      // For JSON-based panels: sanitize and parse
+      let code = artifact.code;
+      code = code.replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, (match) => {
+        return match.replace(/\n/g, '\\n')
+                    .replace(/\r/g, '\\r')
+                    .replace(/\t/g, '\\t');
+      });
+      currentData = JSON.parse(code);
+      
+      // For raw code panels, use directly:
+      // currentData = artifact.code;
+      
+      render(currentData);
+      console.log('Artifact loaded successfully');
+      
+    } catch (e) {
+      console.error('Failed to parse artifact:', e);
+      renderError(e.message);
+    }
+  });
+  
+  // Handle theme changes
+  bridge.on('theme:change', ({ theme, colors }) => {
+    document.documentElement.setAttribute('data-theme', theme);
+  });
+  
+  // Signal ready - IMPORTANT: SDK waits for this before sending artifact
+  bridge.signalReady();
+  
+  console.log('Panel initialized');
+}
+
+function render(data) {
+  const container = document.getElementById('app');
+  container.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+}
+
+function renderError(message) {
+  const container = document.getElementById('app');
+  container.innerHTML = `<div class="error">${message}</div>`;
+}
+
+// Send data back to SDK
+function notifyUpdate(data) {
+  bridge.send('artifact:update', { data });
+}
+
+// Initialize when ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+```
 
 ## Resources
 
