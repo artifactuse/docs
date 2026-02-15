@@ -121,11 +121,16 @@ Access Artifactuse state and methods:
     closePanel,
     togglePanel,
     toggleFullscreen,
-    setViewMode,      // 'preview' | 'code' | 'split'
+    setViewMode,      // 'preview' | 'code' | 'split' | 'edit'
     getPanelUrl,
     getTheme,
     setTheme,
-    
+
+    // Programmatic API
+    openFile,          // Open file in panel (auto-detect language)
+    openCode,          // Open code in panel (explicit language)
+    clearArtifacts,    // Clear all artifacts
+
     // Events
     on,
     off,
@@ -161,6 +166,10 @@ Access Artifactuse state and methods:
     
     on('media:open', ({ type, src }) => {
       console.log('Media opened:', type, src)
+    })
+
+    on('edit:save', ({ artifactId, artifact, code }) => {
+      console.log('Code saved:', code)
     })
   })
 </script>

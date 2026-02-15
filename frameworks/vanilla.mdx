@@ -81,7 +81,29 @@ artifactuse.openArtifact(artifacts[0])
 artifactuse.togglePanel()
 artifactuse.closePanel()
 artifactuse.toggleFullscreen()
-artifactuse.setViewMode('preview') // 'preview' | 'code' | 'split'
+artifactuse.setViewMode('preview') // 'preview' | 'code' | 'split' | 'edit'
+```
+
+### openFile / openCode
+
+Open artifacts programmatically without processing AI message content:
+
+```javascript
+// Open file — auto-detects language from extension
+artifactuse.openFile('app.jsx', code)
+artifactuse.openFile('utils.py', code, { title: 'My Utils' })
+
+// Open code — explicit language
+artifactuse.openCode(code, 'javascript', { title: 'My Script' })
+
+// With tab filtering
+artifactuse.openFile('main.js', code, {
+  tabs: ['code', 'edit'],    // Only show code and edit tabs
+  viewMode: 'edit',           // Start in edit mode
+})
+
+// Clear all artifacts
+artifactuse.clearArtifacts()
 ```
 
 ### Theme
@@ -114,6 +136,10 @@ artifactuse.on('save:request', ({ artifactId, data }) => {
 
 artifactuse.on('export:complete', ({ artifactId, blob, filename }) => {
   download(blob, filename)
+})
+
+artifactuse.on('edit:save', ({ artifactId, artifact, code }) => {
+  console.log('Code saved:', code)
 })
 ```
 
@@ -266,6 +292,13 @@ const artifactuse = createArtifactuse({
     maps: true,
     social: true,
     documents: true,
+  },
+
+  // Code Editor (Optional) — CodeMirror 6 for edit tab
+  // See: /artifacts/code#edit-tab
+  editor: {
+    modules: { /* CodeMirror module imports */ },
+    theme: 'dark', // 'dark' | 'light' | 'auto'
   },
 })
 ```

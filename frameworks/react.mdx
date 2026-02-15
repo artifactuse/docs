@@ -111,11 +111,16 @@ function MyComponent() {
     closePanel,
     togglePanel,
     toggleFullscreen,
-    setViewMode,      // 'preview' | 'code' | 'split'
+    setViewMode,      // 'preview' | 'code' | 'split' | 'edit'
     getPanelUrl,
     getTheme,
     setTheme,
-    
+
+    // Programmatic API
+    openFile,          // Open file in panel (auto-detect language)
+    openCode,          // Open code in panel (explicit language)
+    clearArtifacts,    // Clear all artifacts
+
     // Events
     on,
     off,
@@ -152,6 +157,7 @@ useEffect(() => {
 | `form:cancel` | `{ formId }` | Form cancelled |
 | `social:copy` | `{ platform, text }` | Social text copied |
 | `media:open` | `{ type, src, alt, caption }` | Media opened in lightbox |
+| `edit:save` | `{ artifactId, artifact, code }` | Code saved from edit tab |
 
 ## Full Example
 

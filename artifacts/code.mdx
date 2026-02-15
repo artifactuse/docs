@@ -157,3 +157,202 @@ Features: tree view, collapse/expand, search, JSONPath.
 ```
 
 Shows additions (green) and deletions (red) with side-by-side view option.
+
+## Plain Text
+
+Files with unknown extensions automatically fall back to plain text rendering in the code panel:
+
+```
+key = value
+host = localhost
+port = 3000
+
+[section]
+enabled = true
+```
+
+Supported via the `txt` panel type. This means any file type can be opened — if no specific panel exists for the language, it renders as plain text with the code viewer.
+
+## Programmatic API
+
+Open code artifacts directly without processing AI message content.
+
+### openFile
+
+Auto-detects language from the file extension:
+
+```js
+const { openFile } = useArtifactuse()
+
+// Opens as JSX (React panel)
+openFile('App.jsx', reactCode)
+
+// Opens as Python (code panel)
+openFile('utils.py', pythonCode, { title: 'My Utils' })
+
+// Opens as plain text (unknown extension)
+openFile('config.ini', configContent)
+```
+
+### openCode
+
+Specify the language explicitly:
+
+```js
+const { openCode } = useArtifactuse()
+
+openCode(jsCode, 'javascript')
+openCode(htmlCode, 'html', { title: 'My Page' })
+```
+
+### Options
+
+Both methods accept an options object:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `title` | `string` | Display title (defaults to filename for `openFile`) |
+| `tabs` | `string[]` | Visible tabs: `'preview'`, `'code'`, `'split'`, `'edit'` |
+| `viewMode` | `string` | Initial view mode |
+| `language` | `string` | Override language detection (`openFile` only) |
+
+```js
+// Show only the code editor
+openFile('app.js', code, { tabs: ['edit'] })
+
+// Start in code view, allow preview and code tabs
+openFile('page.html', html, { tabs: ['preview', 'code'], viewMode: 'code' })
+```
+
+### clearArtifacts
+
+Remove all artifacts and close the panel:
+
+```js
+const { clearArtifacts } = useArtifactuse()
+clearArtifacts()
+```
+
+## Edit Tab
+
+The edit tab provides an in-panel code editor powered by [CodeMirror 6](https://codemirror.net/). It's optional — you must provide CodeMirror modules via config to enable it.
+
+### Setup
+
+Install CodeMirror packages:
+
+```bash
+npm install @codemirror/state @codemirror/view @codemirror/commands \
+  @codemirror/language @codemirror/autocomplete \
+  @codemirror/lang-javascript @codemirror/lang-python @lezer/highlight
+```
+
+Pass the modules in your SDK config:
+
+<Tabs>
+  <Tab title="Vue">
+```vue
+<script setup>
+import { provideArtifactuse } from 'artifactuse/vue'
+import * as cmState from '@codemirror/state'
+import * as cmView from '@codemirror/view'
+import * as cmCommands from '@codemirror/commands'
+import * as cmLanguage from '@codemirror/language'
+import * as cmAutocomplete from '@codemirror/autocomplete'
+import * as cmLangJavascript from '@codemirror/lang-javascript'
+import * as cmLangPython from '@codemirror/lang-python'
+import * as lezerHighlight from '@lezer/highlight'
+
+provideArtifactuse({
+  theme: 'dark',
+  editor: {
+    modules: {
+      state: cmState,
+      view: cmView,
+      commands: cmCommands,
+      language: cmLanguage,
+      autocomplete: cmAutocomplete,
+      langJavascript: cmLangJavascript,
+      langPython: cmLangPython,
+      lezerHighlight: lezerHighlight,
+    },
+    theme: 'dark', // 'dark' | 'light' | 'auto'
+  },
+})
+</script>
+```
+  </Tab>
+  <Tab title="React">
+```jsx
+import { ArtifactuseProvider } from 'artifactuse/react'
+import * as cmState from '@codemirror/state'
+import * as cmView from '@codemirror/view'
+import * as cmCommands from '@codemirror/commands'
+import * as cmLanguage from '@codemirror/language'
+import * as cmAutocomplete from '@codemirror/autocomplete'
+import * as cmLangJavascript from '@codemirror/lang-javascript'
+import * as cmLangPython from '@codemirror/lang-python'
+import * as lezerHighlight from '@lezer/highlight'
+
+<ArtifactuseProvider config={{
+  theme: 'dark',
+  editor: {
+    modules: {
+      state: cmState,
+      view: cmView,
+      commands: cmCommands,
+      language: cmLanguage,
+      autocomplete: cmAutocomplete,
+      langJavascript: cmLangJavascript,
+      langPython: cmLangPython,
+      lezerHighlight: lezerHighlight,
+    },
+    theme: 'dark',
+  },
+}}>
+  <YourApp />
+</ArtifactuseProvider>
+```
+  </Tab>
+</Tabs>
+
+### Using the Edit Tab
+
+Once configured, include `'edit'` in the `tabs` array:
+
+```js
+const { openFile } = useArtifactuse()
+
+// Open with only the edit tab
+openFile('app.js', code, { tabs: ['edit'] })
+
+// Open with all tabs including edit
+openFile('page.html', html, { tabs: ['preview', 'code', 'edit'] })
+```
+
+### Handling Saves
+
+When the user clicks the Save button in the edit tab, an `edit:save` event fires:
+
+```js
+const { on } = useArtifactuse()
+
+on('edit:save', ({ artifactId, artifact, code }) => {
+  console.log('Updated code:', code)
+  // Send back to your AI, save to database, etc.
+})
+```
+
+### Editor Theme
+
+The editor theme is independent of the SDK theme and controlled via `editor.theme`:
+
+| Value | Description |
+|-------|-------------|
+| `'dark'` | Dark background (`#1e1e1e`) with light text (default) |
+| `'light'` | White background with dark text |
+| `'auto'` | Follows the SDK theme setting |
+
+<Note>
+Without the `editor` config, the edit tab button won't appear — the feature degrades gracefully. Language modules (`langJavascript`, `langPython`) and `lezerHighlight` are optional but recommended for syntax highlighting.
+</Note>

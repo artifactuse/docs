@@ -114,6 +114,7 @@ The panel automatically positions itself on the right side and is resizable.
 | `save` | `{ artifactId, data }` | Save requested for current artifact |
 | `export` | `{ artifactId, blob, filename }` | Export completed |
 | `form-submit` | `{ formId, action, values }` | Panel form submitted |
+| `edit:save` | `{ artifactId, artifact, code }` | Code saved from edit tab |
 
 ## Handling AI Requests
 
@@ -161,13 +162,14 @@ const handleAIRequest = async ({ prompt, context, requestId }) => {
 
 ## View Modes
 
-The panel supports three view modes:
+The panel supports four view modes:
 
 | Mode | Description |
 |------|-------------|
 | `preview` | Live preview of the artifact (default for HTML, React, Vue) |
-| `code` | Syntax-highlighted code view |
+| `code` | Syntax-highlighted code view (read-only, uses Prism.js) |
 | `split` | Side-by-side preview and code |
+| `edit` | Editable code editor (requires CodeMirror via `editor` config) |
 
 Control view mode programmatically:
 
@@ -177,7 +179,26 @@ const { setViewMode } = useArtifactuse()
 setViewMode('preview')
 setViewMode('code')
 setViewMode('split')
+setViewMode('edit')
 ```
+
+### Tab Filtering
+
+Control which tabs are visible when opening artifacts programmatically:
+
+```js
+const { openFile } = useArtifactuse()
+
+// Only show code and edit tabs
+openFile('app.js', code, { tabs: ['code', 'edit'] })
+
+// Only show preview and code (no split)
+openFile('page.html', code, { tabs: ['preview', 'code'] })
+```
+
+<Note>
+The `edit` tab only appears when CodeMirror modules are provided via the `editor` config option. See [Code Artifacts](/artifacts/code#edit-tab) for setup instructions.
+</Note>
 
 ## Fullscreen
 
@@ -193,7 +214,8 @@ toggleFullscreen()
 
 The panel header includes:
 
-- **View mode tabs** - Switch between preview/code/split
+- **View mode tabs** - Switch between preview/code/split/edit
+- **Save button** - Appears when the edit tab is active (emits `edit:save` event)
 - **Fullscreen button** - Expand to full screen
 - **Close button** - Close the panel
 

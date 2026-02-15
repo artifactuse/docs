@@ -3,6 +3,61 @@ title: Changelog
 description: Latest updates and releases
 ---
 
+<Update label="v0.3.0" description="Programmatic API & Edit Tab">
+
+## New Features
+
+- **`openFile()` / `openCode()`** - Open artifacts programmatically without processing AI messages. `openFile` auto-detects language from the file extension, `openCode` accepts an explicit language
+- **Tab Filtering** - Control which view mode tabs are visible with the `tabs` option: `['preview', 'code', 'split', 'edit']`
+- **Edit Tab** - In-panel code editor powered by CodeMirror 6. Users provide CodeMirror modules via the `editor` config option
+- **`clearArtifacts()`** - Remove all artifacts and close the panel
+- **Plain Text Fallback** - Unknown file extensions automatically fall back to `txt` type, rendered in the code panel as plain text
+
+## New Methods
+
+| Method | Description |
+|--------|-------------|
+| `openFile(filename, code, options?)` | Open file in panel (auto-detect language from extension) |
+| `openCode(code, language, options?)` | Open code in panel (explicit language) |
+| `clearArtifacts()` | Clear all artifacts and close panel |
+
+## New Events
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `edit:save` | `{ artifactId, artifact, code }` | Code saved from edit tab |
+
+## New Config Options
+
+```javascript
+provideArtifactuse({
+  // CodeMirror 6 integration for the edit tab (optional)
+  editor: {
+    modules: {
+      state: cmState,             // @codemirror/state
+      view: cmView,               // @codemirror/view
+      commands: cmCommands,        // @codemirror/commands
+      language: cmLanguage,        // @codemirror/language
+      autocomplete: cmAutocomplete,// @codemirror/autocomplete
+      langJavascript: cmLangJavascript, // @codemirror/lang-javascript (optional)
+      langPython: cmLangPython,    // @codemirror/lang-python (optional)
+      lezerHighlight: lezerHighlight,   // @lezer/highlight (optional)
+    },
+    theme: 'dark', // 'dark' | 'light' | 'auto'
+  },
+})
+```
+
+## Documentation
+
+- Added [Programmatic API](/artifacts/code#programmatic-api) section to Code artifacts page
+- Added [Edit Tab](/artifacts/code#edit-tab) setup guide with CodeMirror configuration
+- Updated all framework guides with `openFile`, `openCode`, `clearArtifacts`, and `edit:save`
+- Updated [Panel component](/components/panel#view-modes) with edit view mode and tab filtering
+- Added `txt` to default panels list
+
+</Update>
+
 <Update label="v0.2.1" description="Cloudflare Workers Deployment">
 
 ## New Features
