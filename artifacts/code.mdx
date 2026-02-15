@@ -215,6 +215,7 @@ Both methods accept an options object:
 | `tabs` | `string[]` | Visible tabs: `'preview'`, `'code'`, `'split'`, `'edit'` |
 | `viewMode` | `string` | Initial view mode |
 | `language` | `string` | Override language detection (`openFile` only) |
+| `panelUrl` | `string` | Custom iframe URL (bypasses panel registry) |
 
 ```js
 // Show only the code editor
@@ -222,6 +223,11 @@ openFile('app.js', code, { tabs: ['edit'] })
 
 // Start in code view, allow preview and code tabs
 openFile('page.html', html, { tabs: ['preview', 'code'], viewMode: 'code' })
+
+// Load a custom panel URL in the iframe
+openFile('data.csv', csvContent, {
+  panelUrl: 'https://my-cdn.com/csv-viewer'
+})
 ```
 
 ### clearArtifacts
