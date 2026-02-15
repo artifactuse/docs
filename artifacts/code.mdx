@@ -245,13 +245,40 @@ The edit tab provides an in-panel code editor powered by [CodeMirror 6](https://
 
 ### Setup
 
-Install CodeMirror packages:
+Install the required CodeMirror packages plus any language packages you need:
 
 ```bash
+# Required
 npm install @codemirror/state @codemirror/view @codemirror/commands \
-  @codemirror/language @codemirror/autocomplete \
-  @codemirror/lang-javascript @codemirror/lang-python @lezer/highlight
+  @codemirror/language @codemirror/autocomplete @lezer/highlight
+
+# Language packages (add only the ones you need)
+npm install @codemirror/lang-javascript @codemirror/lang-python \
+  @codemirror/lang-html @codemirror/lang-css @codemirror/lang-json
 ```
+
+### Supported Language Packages
+
+| Module Key | Package | Languages |
+|------------|---------|-----------|
+| `langJavascript` | `@codemirror/lang-javascript` | JavaScript, JSX, TypeScript, TSX |
+| `langPython` | `@codemirror/lang-python` | Python |
+| `langHtml` | `@codemirror/lang-html` | HTML |
+| `langCss` | `@codemirror/lang-css` | CSS |
+| `langJson` | `@codemirror/lang-json` | JSON |
+| `langMarkdown` | `@codemirror/lang-markdown` | Markdown |
+| `langXml` | `@codemirror/lang-xml` | XML |
+| `langYaml` | `@codemirror/lang-yaml` | YAML |
+| `langSql` | `@codemirror/lang-sql` | SQL |
+| `langJava` | `@codemirror/lang-java` | Java |
+| `langCpp` | `@codemirror/lang-cpp` | C, C++ |
+| `langGo` | `@codemirror/lang-go` | Go |
+| `langRust` | `@codemirror/lang-rust` | Rust |
+| `langPhp` | `@codemirror/lang-php` | PHP |
+| `langVue` | `@codemirror/lang-vue` | Vue SFC |
+| `langAngular` | `@codemirror/lang-angular` | Angular templates |
+| `langLess` | `@codemirror/lang-less` | Less |
+| `langSass` | `@codemirror/lang-sass` | Sass, SCSS |
 
 Pass the modules in your SDK config:
 
@@ -265,9 +292,13 @@ import * as cmView from '@codemirror/view'
 import * as cmCommands from '@codemirror/commands'
 import * as cmLanguage from '@codemirror/language'
 import * as cmAutocomplete from '@codemirror/autocomplete'
+import * as lezerHighlight from '@lezer/highlight'
+// Import only the languages you need
 import * as cmLangJavascript from '@codemirror/lang-javascript'
 import * as cmLangPython from '@codemirror/lang-python'
-import * as lezerHighlight from '@lezer/highlight'
+import * as cmLangHtml from '@codemirror/lang-html'
+import * as cmLangCss from '@codemirror/lang-css'
+import * as cmLangJson from '@codemirror/lang-json'
 
 provideArtifactuse({
   theme: 'dark',
@@ -278,9 +309,12 @@ provideArtifactuse({
       commands: cmCommands,
       language: cmLanguage,
       autocomplete: cmAutocomplete,
+      lezerHighlight: lezerHighlight,
       langJavascript: cmLangJavascript,
       langPython: cmLangPython,
-      lezerHighlight: lezerHighlight,
+      langHtml: cmLangHtml,
+      langCss: cmLangCss,
+      langJson: cmLangJson,
     },
     theme: 'dark', // 'dark' | 'light' | 'auto'
   },
@@ -296,9 +330,13 @@ import * as cmView from '@codemirror/view'
 import * as cmCommands from '@codemirror/commands'
 import * as cmLanguage from '@codemirror/language'
 import * as cmAutocomplete from '@codemirror/autocomplete'
+import * as lezerHighlight from '@lezer/highlight'
+// Import only the languages you need
 import * as cmLangJavascript from '@codemirror/lang-javascript'
 import * as cmLangPython from '@codemirror/lang-python'
-import * as lezerHighlight from '@lezer/highlight'
+import * as cmLangHtml from '@codemirror/lang-html'
+import * as cmLangCss from '@codemirror/lang-css'
+import * as cmLangJson from '@codemirror/lang-json'
 
 <ArtifactuseProvider config={{
   theme: 'dark',
@@ -309,9 +347,12 @@ import * as lezerHighlight from '@lezer/highlight'
       commands: cmCommands,
       language: cmLanguage,
       autocomplete: cmAutocomplete,
+      lezerHighlight: lezerHighlight,
       langJavascript: cmLangJavascript,
       langPython: cmLangPython,
-      lezerHighlight: lezerHighlight,
+      langHtml: cmLangHtml,
+      langCss: cmLangCss,
+      langJson: cmLangJson,
     },
     theme: 'dark',
   },
@@ -360,5 +401,5 @@ The editor theme is independent of the SDK theme and controlled via `editor.them
 | `'auto'` | Follows the SDK theme setting |
 
 <Note>
-Without the `editor` config, the edit tab button won't appear — the feature degrades gracefully. Language modules (`langJavascript`, `langPython`) and `lezerHighlight` are optional but recommended for syntax highlighting.
+Without the `editor` config, the edit tab button won't appear — the feature degrades gracefully. Language modules (e.g. `langJavascript`, `langPython`, `langHtml`) and `lezerHighlight` are optional but recommended for syntax highlighting. Only include the language packages you need — languages without a matching module fall back to plain text editing.
 </Note>
