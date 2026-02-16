@@ -3,6 +3,41 @@ title: Changelog
 description: Latest updates and releases
 ---
 
+<Update label="v0.1.25" description="Update Artifacts In Place">
+
+## New Features
+
+- **`updateFile()`** — Update an existing artifact's code and refresh the panel in place, without creating duplicate tabs. Accepts the artifact object (returned by `openFile`) or an artifact ID string.
+
+## New Methods
+
+| Method | Description |
+|--------|-------------|
+| `updateFile(artifact, code, options?)` | Update existing artifact's code and refresh panel |
+
+```js
+// Open a file — keep reference
+const artifact = openFile('app.html', code, { panelUrl: '...' });
+
+// Later — update in place (same tab, iframe reloads)
+updateFile(artifact, newCode);
+updateFile(artifact.id, newCode, { panelUrl: newUrl });
+```
+
+## New Events
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `artifact:updated` | `{ artifactId, artifact }` | Artifact updated via `updateFile` |
+
+## Documentation
+
+- Added [`updateFile`](/artifacts/code#updatefile) section to Code artifacts page
+- Updated all framework guides with `updateFile` in API listings
+- Updated [Panel component](/components/panel) with `updateFile` example
+
+</Update>
+
 <Update label="v0.1.22" description="Programmatic API & Edit Tab">
 
 ## New Features

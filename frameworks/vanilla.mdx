@@ -106,6 +106,16 @@ artifactuse.openFile('main.js', code, {
 artifactuse.clearArtifacts()
 ```
 
+### updateFile
+
+```js
+const artifact = artifactuse.openFile('app.html', code, { panelUrl: '...' })
+
+// Later — update in place, refresh iframe
+artifactuse.updateFile(artifact, newCode)
+artifactuse.updateFile(artifact.id, newCode, { panelUrl: newUrl })
+```
+
 ### Theme
 
 ```javascript

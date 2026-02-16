@@ -205,6 +205,20 @@ openCode(jsCode, 'javascript')
 openCode(htmlCode, 'html', { title: 'My Page' })
 ```
 
+### updateFile
+
+Updates an existing artifact's code and refreshes the panel without creating a duplicate tab:
+
+```js
+const { openFile, updateFile } = useArtifactuse()
+
+const artifact = openFile('app.html', code, { panelUrl: '...' })
+
+// Later — update in place
+updateFile(artifact, newCode)
+updateFile(artifact.id, newCode, { panelUrl: newUrl })
+```
+
 ### Options
 
 Both methods accept an options object:
