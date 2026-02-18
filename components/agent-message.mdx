@@ -160,12 +160,63 @@ provideArtifactuse({
 |--------|------|---------|-------------|
 | `maxLines` | `number` | `15` | Max lines to show before truncation |
 | `languages` | `string[]` or `true` | `[]` | Languages to show inline preview for, or `true` for all |
+| `minClickableLines` | `number` or `object` | `null` | Disable clicking for short code blocks. Number shorthand or `{ lines, ignoreLanguages }` |
+| `actionLabel` | `string` or `object` | `null` | Customize the fade overlay label. String shorthand or `{ langKey: label, default: label }` |
 
 Clicking a truncated preview opens the full artifact in the panel. Languages not listed still render as cards.
 
 <Note>
   Inline code preview requires [Prism.js](https://prismjs.com/) for syntax highlighting. Load Prism and language grammars via CDN or npm.
 </Note>
+
+### Non-Clickable Short Code
+
+When code is shorter than `maxLines`, the full code is visible — clicking opens a panel that shows the same content. Use `minClickableLines` to disable clicking for these short blocks:
+
+```js
+provideArtifactuse({
+  inlinePreview: {
+    maxLines: 15,
+    languages: ['html', 'javascript', 'python'],
+    minClickableLines: 10,  // short code (< 10 lines) is non-clickable
+  },
+})
+```
+
+For languages where the panel adds value (e.g., HTML renders a live preview), use `ignoreLanguages` to keep them clickable:
+
+```js
+minClickableLines: {
+  lines: 10,
+  ignoreLanguages: ['html', 'markdown', 'jsx', 'vue'],
+},
+```
+
+### Custom Action Labels
+
+Customize the fade overlay label text per language:
+
+```js
+provideArtifactuse({
+  inlinePreview: {
+    maxLines: 15,
+    languages: ['html', 'javascript', 'markdown'],
+    actionLabel: {
+      html: 'Open preview',
+      markdown: 'Open document',
+      default: 'View full code',  // fallback for unlisted languages
+    },
+  },
+})
+```
+
+String shorthand applies to all languages:
+
+```js
+actionLabel: 'Click to expand',
+```
+
+The `(N lines)` suffix is always appended automatically (e.g., "Open preview (24 lines)").
 
 ## Inline Code
 
