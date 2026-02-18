@@ -96,8 +96,12 @@ import { ArtifactuseAgentMessage } from 'artifactuse/svelte'
 | `content` | `string` | Required | Raw message content from AI (Markdown, code blocks, JSON artifacts) |
 | `messageId` | `string` | Required | Unique identifier for the message |
 | `typing` | `boolean` | `false` | Show typing indicator (use while streaming) |
-| `inlineCards` | `boolean` | `true` | Show clickable cards for panel artifacts inline |
+| `inlineCards` | `boolean` | `true` | Show clickable cards for panel artifacts inline. Also configurable globally. |
 | `isLastMessage` | `boolean` | `false` | Whether this is the last message in the conversation. Keeps forms active after page reload. |
+| `inlinePreview` | `object` | `null` | Override global `inlinePreview` config for this message |
+| `inlineCode` | `object` | `null` | Override global `inlineCode` config for this message |
+| `tabs` | `string[]` | `null` | Override visible panel tabs for artifacts from this message |
+| `viewMode` | `string` | `null` | Override initial panel view mode for artifacts from this message |
 
 ## Events
 
@@ -134,13 +138,22 @@ The component automatically renders different artifact types:
 By default, code artifacts render as clickable cards. Enable `inlinePreview` in your SDK config to show truncated syntax-highlighted code previews directly in the message:
 
 ```js
+// Global config
 provideArtifactuse({
-  codeExtraction: { /* ... */ },
   inlinePreview: {
     maxLines: 15,
     languages: ['smartdiff', 'html', 'javascript', 'jsx'],
   },
 })
+```
+
+```vue
+<!-- Or per-message override -->
+<ArtifactuseAgentMessage
+  :content="msg.content"
+  :message-id="msg.id"
+  :inline-preview="{ maxLines: 10, languages: ['html'] }"
+/>
 ```
 
 | Option | Type | Default | Description |
@@ -153,6 +166,76 @@ Clicking a truncated preview opens the full artifact in the panel. Languages not
 <Note>
   Inline code preview requires [Prism.js](https://prismjs.com/) for syntax highlighting. Load Prism and language grammars via CDN or npm.
 </Note>
+
+## Inline Code
+
+To show full syntax-highlighted code directly in the message without extraction or panel, enable `inlineCode`:
+
+```js
+// Global config
+provideArtifactuse({
+  inlineCode: {
+    languages: ['css', 'bash', 'sql'],  // or true for all
+  },
+})
+```
+
+```vue
+<!-- Or per-message override -->
+<ArtifactuseAgentMessage
+  :content="msg.content"
+  :message-id="msg.id"
+  :inline-code="{ languages: true }"
+/>
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `languages` | `string[]` or `true` | `[]` | Languages to show inline, or `true` for all |
+
+Code blocks for listed languages stay as normal `<pre><code>` blocks with Prism.js syntax highlighting. No artifact card, no panel, no extraction.
+
+<Note>
+  When a language matches both `inlineCode` and `inlinePreview`, `inlineCode` takes priority (no extraction).
+</Note>
+
+## Tabs & View Mode
+
+Control which panel tabs are visible and the initial view mode, globally or per-message:
+
+```js
+// Global config
+provideArtifactuse({
+  tabs: ['preview', 'code'],
+  viewMode: 'code',
+})
+```
+
+```vue
+<!-- Or per-message override -->
+<ArtifactuseAgentMessage
+  :content="msg.content"
+  :message-id="msg.id"
+  :tabs="['code']"
+  view-mode="code"
+/>
+```
+
+Available tabs: `'preview'`, `'code'`, `'split'`, `'edit'`. Available view modes match the tab names.
+
+## Config Precedence
+
+All options support both global config and component prop levels. Precedence:
+
+**Component prop → Global config → Default**
+
+```js
+// Global: all messages get code-only tabs
+provideArtifactuse({ tabs: ['preview', 'code'] })
+
+// Override: this specific message gets all tabs
+<ArtifactuseAgentMessage :tabs="['preview', 'code', 'split', 'edit']" />
+```
 
 ## Form Collapse Behavior
 

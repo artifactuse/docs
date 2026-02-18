@@ -3,29 +3,48 @@ title: Changelog
 description: Latest updates and releases
 ---
 
-<Update label="v0.1.27" description="Inline Code Preview & Smart Diff">
+<Update label="v0.1.27" description="Inline Code Preview, Smart Diff & Component Config">
 
 ## New Features
 
 - **Inline Code Preview** - Code artifacts now show a truncated syntax-highlighted preview directly in the message instead of a plain card. Click to open in panel. Configurable per language.
 - **Smart Diff (`smartdiff`)** - New language identifier for structured JSON diffs (`{oldCode, newCode, language}`). Uses the actual language grammar for syntax highlighting with red/green line backgrounds for deletions/insertions.
 - **Standard `diff` preserved** - ` ```diff ` blocks now render normally with Prism's built-in diff grammar, separate from the structured JSON format.
+- **Inline Code (`inlineCode`)** - Show full syntax-highlighted code directly in the message without extraction or panel. Code stays as normal `<pre><code>` blocks.
+- **Component-Level Config** - All config options (`inlinePreview`, `inlineCode`, `tabs`, `viewMode`, `inlineCards`) now work as both global config and per-message component props with clean precedence: component prop → global config → default.
+- **Global `tabs` & `viewMode`** - Control visible panel tabs and initial view mode globally or per-message.
 
 ## New Config Options
 
 ```js
 provideArtifactuse({
   inlinePreview: {
-    maxLines: 15,                                    // Lines before truncation
-    languages: ['smartdiff', 'html', 'javascript'],  // or true for all
+    maxLines: 15,
+    languages: ['smartdiff', 'html', 'javascript'],
   },
+  inlineCode: {
+    languages: ['css', 'bash', 'sql'],
+  },
+  inlineCards: true,
+  tabs: ['preview', 'code'],
+  viewMode: 'preview',
 })
 ```
+
+## New Component Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `inlinePreview` | `object` | `null` | Override global `inlinePreview` for this message |
+| `inlineCode` | `object` | `null` | Override global `inlineCode` for this message |
+| `tabs` | `string[]` | `null` | Override visible panel tabs for this message |
+| `viewMode` | `string` | `null` | Override initial view mode for this message |
 
 ## Documentation
 
 - Added [Smart Diff](/artifacts/code#smart-diff) section to Code artifacts page
-- Added [Inline Code Preview](/components/agent-message#inline-code-preview) config documentation
+- Added [Inline Code](/components/agent-message#inline-code), [Tabs & View Mode](/components/agent-message#tabs--view-mode), and [Config Precedence](/components/agent-message#config-precedence) sections
+- Updated [Inline Code Preview](/components/agent-message#inline-code-preview) with per-message override examples
 - Updated panel mappings to include `smartdiff`
 
 </Update>
