@@ -3,6 +3,33 @@ title: Changelog
 description: Latest updates and releases
 ---
 
+<Update label="v0.1.27" description="Inline Code Preview & Smart Diff">
+
+## New Features
+
+- **Inline Code Preview** - Code artifacts now show a truncated syntax-highlighted preview directly in the message instead of a plain card. Click to open in panel. Configurable per language.
+- **Smart Diff (`smartdiff`)** - New language identifier for structured JSON diffs (`{oldCode, newCode, language}`). Uses the actual language grammar for syntax highlighting with red/green line backgrounds for deletions/insertions.
+- **Standard `diff` preserved** - ` ```diff ` blocks now render normally with Prism's built-in diff grammar, separate from the structured JSON format.
+
+## New Config Options
+
+```js
+provideArtifactuse({
+  inlinePreview: {
+    maxLines: 15,                                    // Lines before truncation
+    languages: ['smartdiff', 'html', 'javascript'],  // or true for all
+  },
+})
+```
+
+## Documentation
+
+- Added [Smart Diff](/artifacts/code#smart-diff) section to Code artifacts page
+- Added [Inline Code Preview](/components/agent-message#inline-code-preview) config documentation
+- Updated panel mappings to include `smartdiff`
+
+</Update>
+
 <Update label="v0.1.25" description="Update Artifacts In Place">
 
 ## New Features

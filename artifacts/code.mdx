@@ -19,7 +19,7 @@ Code artifacts render syntax-highlighted code with live preview and execution.
 | Vue | ` ```vue ` | SFC with preview |
 | JSON | ` ```json ` | Tree view, formatting |
 | SVG | ` ```svg ` | Live preview |
-| Diff | ` ```diff ` | Side-by-side view |
+| Smart Diff | ` ```smartdiff ` | Language-aware side-by-side diff |
 
 ### Code Runtime ⭐ Pro
 
@@ -142,21 +142,25 @@ Features: tree view, collapse/expand, search, JSONPath.
 </svg>
 ```
 
-## Diff
+## Smart Diff
 
-```diff
---- a/config.js
-+++ b/config.js
-@@ -1,5 +1,6 @@
- module.exports = {
-   name: 'my-app',
--  version: '1.0.0',
-+  version: '1.1.0',
-+  author: 'John Doe',
- }
+Use `smartdiff` for structured diffs with language-aware syntax highlighting:
+
+```smartdiff
+{
+  "oldCode": "function greet(name) {\n  return 'Hello ' + name;\n}",
+  "newCode": "function greet(name) {\n  return `Hello ${name}!`;\n}",
+  "language": "javascript"
+}
 ```
 
-Shows additions (green) and deletions (red) with side-by-side view option.
+Each line is highlighted using the **actual language** grammar (e.g., JavaScript keywords, strings) with red/green backgrounds for deleted/inserted lines. The diff panel shows side-by-side or unified view.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `oldCode` | `string` | Original code |
+| `newCode` | `string` | Updated code |
+| `language` | `string` | Language for syntax highlighting (e.g., `javascript`, `python`) |
 
 ## Plain Text
 

@@ -84,7 +84,7 @@ The `code` field contains different formats depending on the panel type:
 |-------|-----------------|-------------|------------------|
 | `json-panel` | `json` | JSON string to display | ✅ Yes |
 | `form-panel` | `form` | JSON form configuration | ✅ Yes |
-| `diff-panel` | `diff` | JSON: `{oldCode, newCode, language}` | ✅ Yes |
+| `diff-panel` | `smartdiff` | JSON: `{oldCode, newCode, language}` | ✅ Yes |
 | `editor-panel` | `canvas`, `video` | JSON: `{width, height, shapes}` | ✅ Yes |
 | `svg-panel` | `svg` | Raw SVG markup | ❌ No |
 | `html-panel` | `html`, `markdown`, `md` | Raw HTML/Markdown | ❌ No |
@@ -663,7 +663,7 @@ The SDK includes these built-in panel mappings:
 | `canvas`, `whiteboard`, `drawing` | `editor-panel/canvas` |
 | `json` | `json-panel` |
 | `svg` | `svg-panel` |
-| `diff`, `patch` | `diff-panel` |
+| `diff`, `patch`, `smartdiff` | `diff-panel` |
 | `javascript`, `js`, `python`, `py` | `code-panel` |
 | `jsx`, `react` | `react-panel` |
 | `vue` | `vue-panel` |

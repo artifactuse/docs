@@ -129,6 +129,31 @@ The component automatically renders different artifact types:
 | Videos | Inline embed (YouTube, Vimeo, etc.) |
 | Other embeds | Inline (maps, documents, etc.) |
 
+## Inline Code Preview
+
+By default, code artifacts render as clickable cards. Enable `inlinePreview` in your SDK config to show truncated syntax-highlighted code previews directly in the message:
+
+```js
+provideArtifactuse({
+  codeExtraction: { /* ... */ },
+  inlinePreview: {
+    maxLines: 15,
+    languages: ['smartdiff', 'html', 'javascript', 'jsx'],
+  },
+})
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `maxLines` | `number` | `15` | Max lines to show before truncation |
+| `languages` | `string[]` or `true` | `[]` | Languages to show inline preview for, or `true` for all |
+
+Clicking a truncated preview opens the full artifact in the panel. Languages not listed still render as cards.
+
+<Note>
+  Inline code preview requires [Prism.js](https://prismjs.com/) for syntax highlighting. Load Prism and language grammars via CDN or npm.
+</Note>
+
 ## Form Collapse Behavior
 
 Inline forms automatically collapse after user interaction to prevent duplicate submissions and keep the chat clean.
