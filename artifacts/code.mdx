@@ -10,7 +10,7 @@ Code artifacts render syntax-highlighted code with live preview and execution.
 
 ## Supported Languages
 
-### Code Previews 🆓
+### Code Previews
 
 | Language | Code Block | Features |
 |----------|------------|----------|
@@ -19,18 +19,16 @@ Code artifacts render syntax-highlighted code with live preview and execution.
 | Vue | ` ```vue ` | SFC with preview |
 | JSON | ` ```json ` | Tree view, formatting |
 | SVG | ` ```svg ` | Live preview |
+| CSV | ` ```csv ` | Spreadsheet viewer |
+| TSV | ` ```tsv ` | Spreadsheet viewer |
 | Smart Diff | ` ```smartdiff ` | Language-aware side-by-side diff |
 
-### Code Runtime ⭐ Pro
+### Code Runtime
 
 | Language | Code Block | Features |
 |----------|------------|----------|
 | JavaScript | ` ```javascript ` | Execution, console output |
 | Python | ` ```python ` | Pyodide execution |
-
-<Note>
-  ⭐ Code Runtime (JavaScript & Python execution) requires a [Pro subscription](https://artifactuse.com/pricing). Code Previews are free.
-</Note>
 
 ## HTML
 
@@ -92,7 +90,7 @@ const count = ref(0)
 </style>
 ```
 
-## JavaScript ⭐ Pro
+## JavaScript
 
 ```javascript
 async function fetchData() {
@@ -106,7 +104,7 @@ fetchData()
 
 Console output (log, warn, error) is captured and displayed.
 
-## Python ⭐ Pro
+## Python
 
 ```python
 import numpy as np
@@ -140,6 +138,26 @@ Features: tree view, collapse/expand, search, JSONPath.
   <circle cx="100" cy="100" r="80" fill="#6366f1"/>
   <text x="100" y="110" text-anchor="middle" fill="white" font-size="24">SVG</text>
 </svg>
+```
+
+## CSV / TSV
+
+```csv
+Name,Department,Salary,Start Date,City
+Alice Johnson,Engineering,95000,2023-01-15,San Francisco
+Bob Smith,Marketing,72000,2022-06-01,New York
+Carol Williams,Engineering,105000,2021-03-22,Seattle
+```
+
+Renders in an interactive spreadsheet. Auto-detects delimiter (comma, tab, pipe, semicolon). Cells are editable — changes are saved back to the artifact automatically.
+
+Use `tsv` for tab-separated data:
+
+```tsv
+Name	Score	Grade
+Alice	95	A
+Bob	82	B
+Carol	91	A
 ```
 
 ## Smart Diff
