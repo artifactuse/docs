@@ -15,6 +15,7 @@ description: Latest updates and releases
 - **Global `tabs` & `viewMode`** - Control visible panel tabs and initial view mode globally or per-message.
 - **`minClickableLines`** - Disable clicking on short inline previews where the panel adds no value. Supports `ignoreLanguages` to exempt previewable languages (HTML, markdown).
 - **`actionLabel`** - Customize the fade overlay label per language (e.g., "Open preview" for HTML, "Open document" for markdown).
+- **`excludeLanguages`** - Exclude specific languages from inline preview when using `languages: true`. Excluded languages fall back to artifact cards.
 
 ## New Config Options
 
@@ -22,7 +23,8 @@ description: Latest updates and releases
 provideArtifactuse({
   inlinePreview: {
     maxLines: 15,
-    languages: ['smartdiff', 'html', 'javascript'],
+    languages: ['smartdiff', 'html', 'javascript'],   // or true for all
+    excludeLanguages: ['typescript', 'go'],            // exclude when languages: true
     minClickableLines: { lines: 10, ignoreLanguages: ['html', 'markdown'] },
     actionLabel: { html: 'Open preview', default: 'View full code' },
   },
@@ -50,7 +52,7 @@ provideArtifactuse({
 - Added [Inline Code](/components/agent-message#inline-code), [Tabs & View Mode](/components/agent-message#tabs--view-mode), and [Config Precedence](/components/agent-message#config-precedence) sections
 - Updated [Inline Code Preview](/components/agent-message#inline-code-preview) with per-message override examples
 - Updated panel mappings to include `smartdiff`
-- Added [Non-Clickable Short Code](/components/agent-message#non-clickable-short-code) and [Custom Action Labels](/components/agent-message#custom-action-labels) sections
+- Added [Exclude Languages](/components/agent-message#exclude-languages), [Non-Clickable Short Code](/components/agent-message#non-clickable-short-code), and [Custom Action Labels](/components/agent-message#custom-action-labels) sections
 
 </Update>
 

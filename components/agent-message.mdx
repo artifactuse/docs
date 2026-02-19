@@ -160,6 +160,7 @@ provideArtifactuse({
 |--------|------|---------|-------------|
 | `maxLines` | `number` | `15` | Max lines to show before truncation |
 | `languages` | `string[]` or `true` | `[]` | Languages to show inline preview for, or `true` for all |
+| `excludeLanguages` | `string[]` | `[]` | Languages to exclude from inline preview (used with `languages: true`) |
 | `minClickableLines` | `number` or `object` | `null` | Disable clicking for short code blocks. Number shorthand or `{ lines, ignoreLanguages }` |
 | `actionLabel` | `string` or `object` | `null` | Customize the fade overlay label. String shorthand or `{ langKey: label, default: label }` |
 
@@ -168,6 +169,21 @@ Clicking a truncated preview opens the full artifact in the panel. Languages not
 <Note>
   Inline code preview requires [Prism.js](https://prismjs.com/) for syntax highlighting. Load Prism and language grammars via CDN or npm.
 </Note>
+
+### Exclude Languages
+
+When using `languages: true`, exclude specific languages from inline preview with `excludeLanguages`. Excluded languages fall back to artifact cards:
+
+```js
+provideArtifactuse({
+  inlinePreview: {
+    languages: true,
+    excludeLanguages: ['typescript', 'go', 'rust'],
+  },
+})
+```
+
+This is only meaningful when `languages: true`. When `languages` is an array, simply omit the language from the array instead.
 
 ### Non-Clickable Short Code
 
