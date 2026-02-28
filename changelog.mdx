@@ -3,6 +3,36 @@ title: Changelog
 description: Latest updates and releases
 ---
 
+<Update label="v0.2.1" description="Configurable Panel Width & Split Position">
+
+## New Features
+
+- **`panelWidth` config & prop** — Set the initial panel width as a percentage (25–75). Configurable globally or per-component. Users can still drag to resize.
+- **`splitPosition` config & prop** — Set the initial split view position as a percentage (20–80). Configurable globally or per-component.
+
+## New Config Options
+
+```js
+provideArtifactuse({
+  panelWidth: 50,
+  splitPosition: 60,
+})
+```
+
+## New Component Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `panelWidth` | `Number` | `65` | Initial panel width (25–75%) |
+| `splitPosition` | `Number` | `50` | Initial split position (20–80%) |
+
+## Documentation
+
+- Added [Props](/components/panel#props) section to ArtifactusePanel page
+- Updated [Theming](/customization/theming#configuration) with layout config options
+
+</Update>
+
 <Update label="v0.2.0" description="All Panels Now Free & Open Source">
 
 ## All Panels Are Now Free

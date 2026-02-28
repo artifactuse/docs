@@ -25,6 +25,8 @@ Set colors in the provider config:
 ```javascript
 provideArtifactuse({
   theme: 'dark',
+  panelWidth: 50,      // Initial panel width % (25–75)
+  splitPosition: 60,   // Initial split view % (20–80)
   colors: {
     primary: '#6366f1',
     background: '#111827',
@@ -38,6 +40,8 @@ provideArtifactuse({
 ```jsx
 <ArtifactuseProvider config={{
   theme: 'dark',
+  panelWidth: 50,
+  splitPosition: 60,
   colors: {
     primary: '#6366f1',
     background: '#111827',
@@ -51,6 +55,8 @@ provideArtifactuse({
 ```javascript
 setArtifactuseContext({
   theme: 'dark',
+  panelWidth: 50,
+  splitPosition: 60,
   colors: {
     primary: '#6366f1',
     background: '#111827',
