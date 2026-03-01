@@ -103,6 +103,7 @@ artifactuse.openCode(code, 'javascript', { title: 'My Script' })
 artifactuse.openFile('main.js', code, {
   tabs: ['code', 'edit'],    // Only show code and edit tabs
   viewMode: 'edit',           // Start in edit mode
+  externalPreview: true,      // Show "Open in new tab" button
 })
 
 // Clear all artifacts
@@ -319,6 +320,9 @@ const artifactuse = createArtifactuse({
     social: true,
     documents: true,
   },
+
+  // Show "Open in new tab" button in panel header (default: false)
+  // externalPreview: false,
 
   // Code Editor (Optional) — CodeMirror 6 for edit tab
   // See: /artifacts/code#edit-tab

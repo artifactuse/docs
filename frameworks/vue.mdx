@@ -76,10 +76,11 @@ provideArtifactuse({ theme: 'dark' })
     @media-open="onMediaOpen"
   />
 
-  <ArtifactusePanel 
+  <ArtifactusePanel
     @ai-request="handleAIRequest"
     @save="handleSave"
     @export="handleExport"
+    :external-preview="true"
   />
 
   <ArtifactusePanelToggle />

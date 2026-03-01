@@ -79,10 +79,11 @@ import {
   onMediaOpen={({ type, src }) => {}}
 />
 
-<ArtifactusePanel 
+<ArtifactusePanel
   onAIRequest={async ({ prompt, context }) => {}}
   onSave={({ artifactId, data }) => {}}
   onExport={({ artifactId, blob, filename }) => {}}
+  externalPreview={true}
 />
 
 <ArtifactusePanelToggle />

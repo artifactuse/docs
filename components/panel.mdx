@@ -112,6 +112,7 @@ The panel automatically positions itself on the right side and is resizable.
 |------|------|---------|-------------|
 | `panelWidth` | `Number` | `65` | Initial panel width as a percentage (25–75). Users can still drag to resize. |
 | `splitPosition` | `Number` | `50` | Initial split view position as a percentage (20–80). Users can still drag to resize. |
+| `externalPreview` | `Boolean` | `false` | Show "Open in new tab" button in panel header. Only visible when a preview URL exists. |
 
 <Tabs>
   <Tab title="Vue">
@@ -260,6 +261,7 @@ The panel header includes:
 
 - **View mode tabs** - Switch between preview/code/split/edit
 - **Save button** - Appears when the edit tab is active (emits `edit:save` event)
+- **Open in new tab button** - Opens the artifact preview URL in a new browser tab (requires `externalPreview` enabled and a preview URL)
 - **Fullscreen button** - Expand to full screen
 - **Close button** - Close the panel
 
