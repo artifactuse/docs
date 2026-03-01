@@ -114,6 +114,7 @@ const {
   // Methods
   processMessage,
   openArtifact,
+  openPanel,
   closePanel,
   togglePanel,
   toggleFullscreen,
@@ -169,6 +170,19 @@ onMounted(() => {
 
   on('edit:save', ({ artifactId, artifact, code }) => {
     console.log('Code saved:', code)
+  })
+
+  // Panel lifecycle events
+  on('panel:opened', () => {
+    console.log('Panel opened')
+  })
+
+  on('panel:closed', () => {
+    console.log('Panel closed')
+  })
+
+  on('panel:toggled', ({ isOpen }) => {
+    console.log('Panel toggled:', isOpen)
   })
 })
 </script>

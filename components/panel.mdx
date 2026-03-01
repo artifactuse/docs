@@ -269,6 +269,50 @@ The panel footer includes:
 - **Navigation** - Previous/next artifact buttons
 - **Actions** - Copy, download, export buttons
 
+## Panel Methods
+
+Control the panel programmatically:
+
+```js
+const { openPanel, closePanel, togglePanel } = useArtifactuse()
+
+openPanel()       // Open panel in empty "viewer" state
+closePanel()      // Close panel
+togglePanel()     // Toggle panel open/closed
+```
+
+### openPanel()
+
+Opens the panel in an empty viewer state with no artifact selected. The panel displays an "Artifact Viewer" header and a prompt to open an artifact. When an artifact is subsequently opened (via `openArtifact()`, `openFile()`, or `openCode()`), the empty state is automatically cleared.
+
+This is useful for showing the panel before any artifact content is ready — for example, while waiting for an AI response.
+
+### Panel Events
+
+Listen for panel lifecycle events:
+
+```js
+const { on } = useArtifactuse()
+
+on('panel:opened', () => {
+  console.log('Panel opened')
+})
+
+on('panel:closed', () => {
+  console.log('Panel closed')
+})
+
+on('panel:toggled', ({ isOpen }) => {
+  console.log('Panel toggled:', isOpen)
+})
+```
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `panel:opened` | — | Emitted when `openPanel()` is called |
+| `panel:closed` | — | Emitted when `closePanel()` is called or the close button is clicked |
+| `panel:toggled` | `{ isOpen }` | Emitted when `togglePanel()` is called |
+
 ## Artifact Navigation
 
 When multiple artifacts exist, users can navigate between them using the footer controls or programmatically:

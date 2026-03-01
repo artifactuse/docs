@@ -78,11 +78,14 @@ artifactuse.openArtifact(artifacts[0])
 ### Panel Methods
 
 ```javascript
-artifactuse.togglePanel()
-artifactuse.closePanel()
+artifactuse.openPanel()       // Opens panel in empty "viewer" state
+artifactuse.closePanel()      // Close panel
+artifactuse.togglePanel()     // Toggle panel open/closed
 artifactuse.toggleFullscreen()
 artifactuse.setViewMode('preview') // 'preview' | 'code' | 'split' | 'edit'
 ```
+
+`openPanel()` opens the panel with no artifact selected, showing an "Artifact Viewer" header and a prompt to open an artifact. When an artifact is subsequently opened (via `openArtifact()`, `openFile()`, or `openCode()`), the empty state is automatically cleared.
 
 ### openFile / openCode
 
@@ -150,6 +153,19 @@ artifactuse.on('export:complete', ({ artifactId, blob, filename }) => {
 
 artifactuse.on('edit:save', ({ artifactId, artifact, code }) => {
   console.log('Code saved:', code)
+})
+
+// Panel lifecycle events
+artifactuse.on('panel:opened', () => {
+  console.log('Panel opened')
+})
+
+artifactuse.on('panel:closed', () => {
+  console.log('Panel closed')
+})
+
+artifactuse.on('panel:toggled', ({ isOpen }) => {
+  console.log('Panel toggled:', isOpen)
 })
 ```
 

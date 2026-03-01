@@ -108,6 +108,7 @@ function MyComponent() {
     // Methods
     processMessage,
     openArtifact,
+    openPanel,
     closePanel,
     togglePanel,
     toggleFullscreen,
@@ -159,6 +160,9 @@ useEffect(() => {
 | `social:copy` | `{ platform, text }` | Social text copied |
 | `media:open` | `{ type, src, alt, caption }` | Media opened in lightbox |
 | `edit:save` | `{ artifactId, artifact, code }` | Code saved from edit tab |
+| `panel:opened` | — | Panel opened |
+| `panel:closed` | — | Panel closed |
+| `panel:toggled` | `{ isOpen }` | Panel toggled |
 
 ## Full Example
 
