@@ -283,6 +283,52 @@ openArtifact(artifact)
 const allArtifacts = state.artifacts
 ```
 
+## Multi-Tab
+
+Enable multi-tab mode to open multiple artifacts as tabs, similar to a code editor:
+
+```js
+provideArtifactuse({
+  multiTab: true,
+})
+```
+
+When enabled:
+
+- Clicking an artifact card or calling `openFile()` / `openCode()` opens it in a new tab (or focuses it if already open)
+- Each tab preserves its own view mode (preview, code, split, edit)
+- Closing the active tab switches to the adjacent tab
+- The prev/next navigation is replaced by the tab bar
+- Artifacts from streamed messages do **not** auto-open as tabs
+
+### Tab Methods
+
+```js
+const { closeTab, closeOtherTabs, closeAllTabs } = useArtifactuse()
+
+// Close a specific tab
+closeTab(artifactId)
+
+// Close all tabs except one
+closeOtherTabs(artifactId)
+
+// Close all open tabs
+closeAllTabs()
+```
+
+### State
+
+When multi-tab is active, two additional state fields are available:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `state.openTabs` | `string[]` | Ordered array of open artifact IDs |
+| `state.tabViewModes` | `object` | Map of artifact ID to view mode per tab |
+
+<Note>
+Multi-tab is opt-in and disabled by default. When `multiTab: false` (default), the panel behaves exactly as before with single-artifact navigation.
+</Note>
+
 ## Mobile Behavior
 
 On mobile devices (< 768px), the panel:

@@ -3,6 +3,42 @@ title: Changelog
 description: Latest updates and releases
 ---
 
+<Update label="v0.2.2" description="Multi-Tab Artifact Panel">
+
+## New Features
+
+- **Multi-tab mode** — Open multiple artifacts as tabs, like a code editor. Switch between tabs, close individually, and each tab remembers its own view mode. Opt-in via `multiTab: true` in config.
+
+## New Config Options
+
+```js
+provideArtifactuse({
+  multiTab: true,
+})
+```
+
+## New Methods
+
+| Method | Description |
+|--------|-------------|
+| `closeTab(artifactId)` | Close a specific tab |
+| `closeOtherTabs(artifactId)` | Close all tabs except the specified one |
+| `closeAllTabs()` | Close all open tabs |
+
+## How It Works
+
+- Clicking an artifact card or using `openFile()` / `openCode()` opens the artifact in a new tab (or focuses it if already open)
+- Each tab preserves its own view mode (preview, code, split, edit)
+- Closing the active tab switches to the adjacent tab
+- The old prev/next navigation is hidden when multi-tab is active
+- When disabled (default), the existing single-artifact behavior is unchanged
+
+## Documentation
+
+- Added [Multi-Tab](/components/panel#multi-tab) section to ArtifactusePanel page
+
+</Update>
+
 <Update label="v0.2.1" description="Configurable Panel Width & Split Position">
 
 ## New Features
