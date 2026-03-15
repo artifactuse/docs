@@ -253,6 +253,7 @@ Both methods accept an options object:
 | `language` | `string` | Override language detection (`openFile` only) |
 | `panelUrl` | `string` | Custom iframe URL (bypasses panel registry) |
 | `externalPreview` | `boolean` | Show "Open in new tab" button in panel header |
+| `consolePanel` | `boolean` | Show console footer for runtime logs/errors (default: `true`) |
 
 ```js
 // Show only the code editor
@@ -426,6 +427,27 @@ on('edit:save', ({ artifactId, artifact, code }) => {
   // Send back to your AI, save to database, etc.
 })
 ```
+
+### Console Output
+
+HTML artifacts capture `console.log`, `console.warn`, `console.error`, `console.info`, and uncaught exceptions from user code. A collapsible console footer appears in the panel when entries exist, auto-expanding on errors.
+
+The console header includes **filter toggles** for each log type (error, warn, info, log). Click a filter to hide/show entries of that type. Filters only appear when entries of that type exist.
+
+Listen for console events to send errors back to your AI agent:
+
+```js
+const { on } = useArtifactuse()
+
+on('console:log', ({ artifactId, entry }) => {
+  // entry: { type: 'log'|'warn'|'error'|'info', content: string, timestamp: number, stack?: string }
+  if (entry.type === 'error') {
+    // Send error back to AI for auto-fix
+  }
+})
+```
+
+Set `consolePanel: false` in config or per-artifact options to hide the footer UI while still receiving events.
 
 ### Editor Theme
 

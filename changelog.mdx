@@ -3,6 +3,44 @@ title: Changelog
 description: Latest updates and releases
 ---
 
+<Update label="v0.3.0" description="Console Output & Log Filtering">
+
+## New Features
+
+- **Console capture** — HTML artifacts now capture `console.log`, `console.warn`, `console.error`, `console.info`, and uncaught exceptions from user code.
+- **Console footer** — A collapsible console footer appears in the panel when log entries exist. Auto-expands when an error is captured.
+- **Log type filters** — Clickable filter chips in the console header let you show/hide entries by type (error, warn, info, log).
+- **`console:log` event** — Listen for console output from artifacts to send errors back to your AI agent for auto-fixing.
+
+## New Config Options
+
+```js
+provideArtifactuse({
+  consolePanel: true, // Show console footer (default: true)
+})
+```
+
+## New Events
+
+```js
+const { on } = useArtifactuse()
+
+on('console:log', ({ artifactId, entry }) => {
+  // entry: { type: 'log'|'warn'|'error'|'info', content: string, timestamp: number, stack?: string }
+  if (entry.type === 'error') {
+    // Send error back to AI for auto-fix
+  }
+})
+```
+
+Set `consolePanel: false` in config or per-artifact options to hide the footer UI while still receiving events.
+
+## Documentation
+
+- Added [Console Output](/artifacts/code#console-output) section to Code artifacts page
+
+</Update>
+
 <Update label="v0.2.2" description="Multi-Tab Artifact Panel">
 
 ## New Features
