@@ -3,6 +3,14 @@ title: Changelog
 description: Latest updates and releases
 ---
 
+<Update label="v0.4.1" description="Fix duplicate image in agent message">
+
+## Bug Fixes
+
+- **Duplicate image rendered in agent messages** — When a message contained a raw image URL (e.g. `https://example.com/photo.png`), the image processor was rendering the image twice: once from the auto-linked `<a>` tag and a second time from the URL leaking as plain text into the image caption div. The fix strips raw URLs from caption text and adds a re-protection step between the two image-processing passes so the raw-URL regex can never double-process content created in the same pass.
+
+</Update>
+
 <Update label="v0.4.0" description="Binary Workspace File Preview">
 
 ## New Features
