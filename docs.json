@@ -71,7 +71,8 @@
               "artifacts/video",
               "artifacts/code",
               "artifacts/forms",
-              "artifacts/social"
+              "artifacts/social",
+              "artifacts/files"
             ]
           },
           {

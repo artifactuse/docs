@@ -3,6 +3,45 @@ title: Changelog
 description: Latest updates and releases
 ---
 
+<Update label="v0.4.0" description="Binary Workspace File Preview">
+
+## New Features
+
+- **Workspace file preview** — Binary files from a workspace (images, audio, video, PDFs, fonts) can now be displayed in the panel by passing base64 content in an artifact. The panel converts them to blob URLs and renders the appropriate element.
+- **Six preview categories** — `image` (`<img>`), `audio` (`<audio controls>`), `video` (`<video controls>`), `pdf` (embedded viewer), `font` (`@font-face` glyph preview), `binary` (hex dump fallback).
+- **Automatic blob URL management** — The panel creates and revokes `Object URL`s internally. No cleanup needed by the caller.
+- **Extensible** — `BINARY_EXTS`, `BINARY_EXT_LANGUAGE`, `getMimeType`, `base64ToObjectUrl`, and `revokeBlobUrl` are exported as public API so developers can register additional extensions.
+
+## New Exports
+
+```js
+import {
+  BINARY_EXTS,
+  BINARY_EXT_LANGUAGE,
+  getMimeType,
+  base64ToObjectUrl,
+  revokeBlobUrl,
+} from '@artifactuse/sdk';
+```
+
+## Usage
+
+```js
+import { BINARY_EXT_LANGUAGE } from '@artifactuse/sdk';
+
+const ext = 'png';
+sdk.createArtifact(base64Content, BINARY_EXT_LANGUAGE[ext], {
+  title: 'logo.png',
+  fileExtension: ext,
+});
+```
+
+## Documentation
+
+- Added [Workspace Files](/artifacts/files) page
+
+</Update>
+
 <Update label="v0.3.0" description="Console Output & Log Filtering">
 
 ## New Features

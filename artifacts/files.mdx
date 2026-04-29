@@ -1,0 +1,79 @@
+---
+title: Workspace Files
+description: Preview binary files (images, audio, video, PDFs, fonts) from a workspace
+icon: "file"
+---
+
+## Overview
+
+Workspace file preview lets you display binary files stored in a workspace database directly inside the panel. Files are passed as base64-encoded strings and the panel converts them to blob URLs internally — no server required.
+
+Supported categories: **image**, **audio**, **video**, **PDF**, **font**, and a **hex dump** fallback for generic binary files.
+
+## Supported File Types
+
+| Category | Extensions | Preview |
+|----------|------------|---------|
+| Image | `png` `jpg` `jpeg` `gif` `webp` `ico` `bmp` `tiff` `svg` | `<img>` element |
+| Audio | `mp3` `wav` `ogg` `flac` `aac` | `<audio controls>` player |
+| Video | `mp4` `m4a` `webm` | `<video controls>` player |
+| PDF | `pdf` | Embedded `<iframe>` viewer |
+| Font | `woff` `woff2` `ttf` `eot` `otf` | `@font-face` glyph preview |
+| Binary | `bin` | Hex dump (first 512 bytes) |
+
+## Creating a Binary File Artifact
+
+Use `BINARY_EXT_LANGUAGE` to map the file extension to the correct language group, then call `createArtifact` with the base64 content:
+
+```js
+import { BINARY_EXT_LANGUAGE } from '@artifactuse/sdk';
+
+const filename = 'logo.png';
+const ext = filename.split('.').pop().toLowerCase();
+const language = BINARY_EXT_LANGUAGE[ext] ?? 'binary';
+
+sdk.createArtifact(base64Content, language, {
+  title: filename,
+  fileExtension: ext,
+});
+```
+
+The panel detects the `language` value, creates a blob URL from the base64 content, and renders the appropriate element automatically.
+
+## Browser Support Notes
+
+| Format | Support |
+|--------|---------|
+| `png` `jpg` `gif` `webp` `svg` `mp3` `wav` `ogg` `mp4` `webm` | All major browsers |
+| `flac` `aac` | Chrome, Firefox, Safari (not IE) |
+| `m4a` | Chrome, Safari; limited Firefox support |
+| `pdf` embedded | Chrome, Firefox, Safari (uses built-in PDF viewer) |
+| `woff2` `ttf` `otf` | All modern browsers |
+| `eot` | Legacy IE only; renders as hex dump in modern browsers |
+
+## Blob URL Lifecycle
+
+The panel manages blob URL creation and cleanup automatically:
+
+- A blob URL is created the first time an artifact is displayed.
+- It is cached for the lifetime of the artifact tab.
+- When a tab is closed or the panel unmounts, `URL.revokeObjectURL()` is called automatically.
+
+No manual cleanup is needed on the caller side.
+
+## Extending with Custom Types
+
+`BINARY_EXTS`, `BINARY_EXT_LANGUAGE`, and the utilities from `binaryPreview.js` are exported as public API so you can support additional file types:
+
+```js
+import { BINARY_EXTS, BINARY_EXT_LANGUAGE, getMimeType, base64ToObjectUrl, revokeBlobUrl } from '@artifactuse/sdk';
+
+// Register a new extension
+BINARY_EXTS.add('avif');
+BINARY_EXT_LANGUAGE['avif'] = 'image'; // maps to the image category
+
+// Or convert to a blob URL yourself
+const url = base64ToObjectUrl(base64, getMimeType('avif'));
+// ... use url ...
+revokeBlobUrl(url); // when done
+```
